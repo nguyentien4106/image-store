@@ -2,6 +2,14 @@ export interface User {
     userId: string
     userName: string
     email: string
+    aud: string
+    exp: number
+    iat: number
+    iss: string
+    sub: string
+    role: string
+    name: string
+    
   }
   
   export interface AuthToken {

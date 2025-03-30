@@ -1,8 +1,9 @@
 import { createBrowserRouter } from 'react-router-dom'
-import { ProtectedLayout } from '@/layouts/ProtectedLayout'
-import { PublicLayout } from '@/layouts/PublicLayout'
+import { ProtectedLayout } from '@/layouts/protected-layout'
+import { PublicLayout } from '@/layouts/public-layout'
 import { authRoutes } from './auth'
 import { dashboardRoutes } from './dashboard'
+import { imageRoutes } from './images'
 
 export const router = createBrowserRouter([
   {
@@ -13,6 +14,6 @@ export const router = createBrowserRouter([
   {
     path: '/',
     element: <ProtectedLayout />,
-    children: dashboardRoutes,
+    children: [...dashboardRoutes, ...imageRoutes],
   },
 ]) 

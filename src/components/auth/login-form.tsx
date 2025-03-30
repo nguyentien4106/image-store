@@ -38,7 +38,7 @@ export function LoginForm({
       if(!result.succeed){
         error(result.message)
       } else {
-        navigate('/dashboard')
+        navigate('/images')
       }
     } catch (err) {
       error('Invalid email or password')
