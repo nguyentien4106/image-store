@@ -2,14 +2,14 @@ import { Button } from "@/components/ui/button"
 import { Upload } from "lucide-react"
 
 interface UploadButtonProps {
-  onUpload: (files: File[]) => void
+  onUpload: (files: File) => void
 }
 
 export function UploadButton({ onUpload }: UploadButtonProps) {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
     if (files) {
-      onUpload(Array.from(files))
+      onUpload(files[0])
     }
   }
 

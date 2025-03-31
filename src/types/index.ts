@@ -3,3 +3,8 @@ export interface AppResponse<T> {
   message: string
   data: T
 }
+
+export interface LoadingState {
+  isLoading: boolean
+  loadingText?: string
+} 

@@ -1,9 +1,6 @@
+import { LoadingState } from '@/types';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-interface LoadingState {
-  isLoading: boolean
-  loadingText?: string
-}
 
 const initialState: LoadingState = {
   isLoading: false,

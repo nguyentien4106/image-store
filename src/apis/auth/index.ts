@@ -1,7 +1,7 @@
 import type { AuthToken, LoginRequest, SignUpRequest, User } from "@/types/auth";
 import { api } from "@/services/api";
 import Cookies from "js-cookie";
-import { AppResponse } from "@/types/response";
+import { AppResponse } from "@/types";
 
 const ACCESS_TOKEN_NAME = "accessToken";
 const REFRESH_TOKEN_NAME = "refreshToken";

@@ -1,18 +1,12 @@
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ImageIcon, Trash2, Download } from "lucide-react"
-
-interface Image {
-  id: string
-  url: string
-  name: string
-  createdAt: string
-}
+import { R2File } from "@/types/images"
 
 interface ListImagesProps {
-  images: Image[]
-  onDelete?: (id: string) => void
-  onDownload?: (id: string) => void
+  images: R2File[]
+  onDelete?: (fileName: string) => void
+  onDownload?: (url: string) => void
 }
 
 export function ListImages({ images, onDelete, onDownload }: ListImagesProps) {
@@ -28,60 +22,63 @@ export function ListImages({ images, onDelete, onDownload }: ListImagesProps) {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      {images.map((image) => (
-        <Card key={image.id} className="overflow-hidden">
-          <CardHeader className="p-0">
-            <div className="aspect-square relative">
-              <img
-                src={image.url}
-                alt={image.name}
-                className="object-cover w-full h-full"
-              />
-              <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                {onDownload && (
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    onClick={() => onDownload(image.id)}
-                    className="bg-white/90 hover:bg-white"
-                  >
-                    <Download className="h-4 w-4" />
-                  </Button>
-                )}
-                {onDelete && (
-                  <Button
-                    variant="destructive"
-                    size="icon"
-                    onClick={() => onDelete(image.id)}
-                    className="bg-white/90 hover:bg-white"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                )}
+      {images.map((image) => {
+        const filename = image.fileName
+        return (
+          <Card key={filename} className="overflow-hidden">
+            <CardHeader className="p-0">
+              <div className="aspect-square relative">
+                <img
+                  src={image.url}
+                  alt={filename}
+                  className="object-cover w-full h-full"
+                />
+                <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                  {onDownload && (
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      onClick={() => onDownload(image.url)}
+                      className="bg-white/90 hover:bg-white"
+                    >
+                      <Download className="h-4 w-4" />
+                    </Button>
+                  )}
+                  {onDelete && (
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      onClick={() => onDelete(image.fileName)}
+                      className="bg-white/90 hover:bg-white"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
               </div>
-            </div>
-          </CardHeader>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <ImageIcon className="h-4 w-4 text-green-500" />
-              <h3 className="font-medium truncate">{image.name}</h3>
-            </div>
-            <p className="text-sm text-gray-500">
-              {new Date(image.createdAt).toLocaleDateString()}
-            </p>
-          </CardContent>
-          <CardFooter className="p-4 pt-0">
-            <div className="flex justify-between items-center w-full">
-              <span className="text-sm text-gray-500">
-                {(Math.random() * 2).toFixed(1)} MB
-              </span>
-              <span className="text-sm text-gray-500">
-                {`${Math.floor(Math.random() * 1000)}x${Math.floor(Math.random() * 1000)}`}
-              </span>
-            </div>
-          </CardFooter>
-        </Card>
-      ))}
+            </CardHeader>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2">
+                <ImageIcon className="h-4 w-4 text-green-500" />
+                <h3 className="font-medium truncate">{filename}</h3>
+              </div>
+              <p className="text-sm text-gray-500">
+                {new Date().toLocaleDateString()}
+              </p>
+            </CardContent>
+            <CardFooter className="p-4 pt-0">
+              <div className="flex justify-between items-center w-full">
+                <span className="text-sm text-gray-500">
+                  {(Math.random() * 2).toFixed(1)} MB
+                </span>
+                <span className="text-sm text-gray-500">
+                  {`${Math.floor(Math.random() * 1000)}x${Math.floor(Math.random() * 1000)}`}
+                </span>
+              </div>
+            </CardFooter>
+          </Card>
+        )
+      })}
     </div>
   )
 }
