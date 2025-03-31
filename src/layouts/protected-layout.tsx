@@ -44,22 +44,38 @@ export function ProtectedLayout() {
     navigate('/login')
   }
 
+  const truncateEmail = (email: string) => {
+    const atIndex = email.indexOf('@')
+    if (atIndex === -1) return email
+
+    const username = email.substring(0, atIndex)
+    const domain = email.substring(atIndex)
+    
+    // Show first 30% of username + @domain
+    const truncatedUsername = username.substring(0, Math.ceil(username.length * 0.3))
+    return `${truncatedUsername}...${domain}`
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="container mx-auto h-16 flex items-center justify-between">
           <h1 className="text-3xl font-bold text-primary">EStore</h1>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1">
             {user && (
               <>
-                <span className="text-sm text-muted-foreground">{user.email}</span>
+                <span className="text-sm text-muted-foreground">
+                  <span className="md:hidden">{truncateEmail(user.email)}</span>
+                  <span className="hidden md:inline">{user.email}</span>
+                </span>
                 <Button 
                   variant="ghost" 
                   size="sm"
                   onClick={handleLogout}
+                  className="flex items-center"
                 >
                   <LogOut className="mr-2 h-4 w-4" />
-                  Logout
+                  <span className="hidden sm:inline">Logout</span>
                 </Button>
               </>
             )}

@@ -8,7 +8,7 @@ interface UploadButtonProps {
 export function UploadButton({ onUpload }: UploadButtonProps) {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
-    if (files) {
+    if (files?.length) {
       onUpload(files[0])
     }
   }
@@ -25,7 +25,7 @@ export function UploadButton({ onUpload }: UploadButtonProps) {
       <Button asChild>
         <label htmlFor="upload-button" className="cursor-pointer">
           <Upload className="mr-2 h-4 w-4" />
-          Upload Image
+          Upload
         </label>
       </Button>
     </div>

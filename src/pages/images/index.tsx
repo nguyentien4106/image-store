@@ -52,7 +52,7 @@ export default function ImagesPage() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Images</h1>
+        <h1 className="text-3xl font-bold">Files</h1>
         <UploadButton onUpload={handleUpload} />
       </div>
       <ListImages 
