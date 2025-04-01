@@ -1,16 +1,17 @@
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ImageIcon, Trash2, Download } from "lucide-react"
-import { R2File } from "@/types/images"
+import { R2File } from "@/types/files"
+import { getFileName } from "@/lib/utils"
 
-interface ListImagesProps {
-  images: R2File[]
+interface ListFilesProps {
+  files: R2File[]
   onDelete?: (fileName: string) => void
   onDownload?: (url: string) => void
 }
 
-export function ListImages({ images, onDelete, onDownload }: ListImagesProps) {
-  if (images.length === 0) {
+export function ListFiles({ files, onDelete, onDownload }: ListFilesProps) {
+  if (files.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <ImageIcon className="h-12 w-12 text-gray-400 mb-4" />
@@ -22,14 +23,14 @@ export function ListImages({ images, onDelete, onDownload }: ListImagesProps) {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      {images.map((image) => {
-        const filename = image.fileName
+      {files.map((file) => {
+        const filename = file.fileName
         return (
           <Card key={filename} className="overflow-hidden">
             <CardHeader className="p-0">
               <div className="aspect-square relative">
                 <img
-                  src={image.url}
+                  src={file.url}
                   alt={filename}
                   className="object-cover w-full h-full"
                 />
@@ -38,7 +39,7 @@ export function ListImages({ images, onDelete, onDownload }: ListImagesProps) {
                     <Button
                       variant="secondary"
                       size="icon"
-                      onClick={() => onDownload(image.url)}
+                      onClick={() => onDownload(file.url)}
                       className="bg-white/90 hover:bg-white"
                     >
                       <Download className="h-4 w-4" />
@@ -48,7 +49,7 @@ export function ListImages({ images, onDelete, onDownload }: ListImagesProps) {
                     <Button
                       variant="destructive"
                       size="icon"
-                      onClick={() => onDelete(image.fileName)}
+                      onClick={() => onDelete(file.fileName)}
                       className="bg-white/90 hover:bg-white"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -60,7 +61,7 @@ export function ListImages({ images, onDelete, onDownload }: ListImagesProps) {
             <CardContent className="p-4">
               <div className="flex items-center gap-2">
                 <ImageIcon className="h-4 w-4 text-green-500" />
-                <h3 className="font-medium truncate">{filename}</h3>
+                <h3 className="font-medium truncate">{getFileName(filename)}</h3>
               </div>
               <p className="text-sm text-gray-500">
                 {new Date().toLocaleDateString()}

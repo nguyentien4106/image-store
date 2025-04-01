@@ -1,10 +1,10 @@
 import { useCallback } from 'react'
 import { useNotification } from '../notification'
 
-export const useDownloadImage = () => {
+export const useDownloadFile = () => {
   const { success, error } = useNotification()
 
-  const downloadImage = useCallback(async (url: string) => {
+  const downloadFile = useCallback(async (url: string) => {
     try {
       const response = await fetch(url, {
         method: 'GET',
@@ -38,5 +38,5 @@ export const useDownloadImage = () => {
     }
   }, [success, error])
 
-  return { downloadImage }
+  return { downloadFile }
 }

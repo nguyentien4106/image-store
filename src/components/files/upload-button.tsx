@@ -17,7 +17,7 @@ export function UploadButton({ onUpload }: UploadButtonProps) {
     <div className="relative">
       <input
         type="file"
-        accept="image/*"
+        accept="*"
         onChange={handleFileChange}
         className="hidden"
         id="upload-button"

@@ -1,4 +1,4 @@
-export interface UploadImageFormData {
+export interface UploadFileFormData {
     file: File
     userName: string
 }

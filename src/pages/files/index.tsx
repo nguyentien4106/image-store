@@ -1,48 +1,48 @@
 import { useEffect, useState } from "react"
-import { ListImages } from "@/components/images/list-images"
-import { UploadButton } from "@/components/images/upload-button"
+import { ListFiles } from "@/components/files/list-files"
+import { UploadButton } from "@/components/files/upload-button"
 import { useNotification } from "@/hooks/notification"
-import imageApi from "@/apis/images"
+import fileApi from "@/apis/files"
 import { RootState } from "@/store"
 import { useSelector } from "react-redux"
-import { R2File } from "@/types/images"
-import { useDownloadImage } from "@/hooks/images"
+import { R2File } from "@/types/files"
+import { useDownloadFile } from "@/hooks/files"
 
-export default function ImagesPage() {
-  const [images, setImages] = useState<R2File[]>([])
+export default function FilesPage() {
+  const [files, setFiles] = useState<R2File[]>([])
   const { success, error } = useNotification()
   const { user } = useSelector((state: RootState) => state.user)
-  const { downloadImage } = useDownloadImage()
+  const { downloadFile } = useDownloadFile()
 
   useEffect(() => {
-    imageApi.getUserImages(user?.userName || "").then((res) => {
-      setImages(res.data)
+    fileApi.getUserFiles(user?.userName || "").then((res) => {
+      setFiles(res.data)
     })
   }, [])
 
   const handleDelete = async (fileName: string) => {
-    const result = await imageApi.deleteImage(fileName)
+    const result = await fileApi.deleteFile(fileName)
     if(result.succeed){
-      setImages(images.filter(image => image.fileName !== fileName))
-      success("Image deleted successfully")
+      setFiles(files.filter(file => file.fileName !== fileName))
+      success("File deleted successfully")
     } else {
       error(result.message)
     }
   }
 
   const handleDownload = async (url: string) => {
-    await downloadImage(url)
+    await downloadFile(url)
   }
 
   const handleUpload = (file: File) => {
-    imageApi.uploadImage({
+    fileApi.uploadFile({
       file: file,
       userName: user?.userName || ""
     }).then((res) => {
       console.log(res)
       if(res.succeed){
-        setImages([ res.data, ...images ])
-        success("Image uploaded successfully")
+        setFiles([ res.data, ...files ])
+        success("File uploaded successfully")
       } else {
         error(res.message)
       }
@@ -55,8 +55,8 @@ export default function ImagesPage() {
         <h1 className="text-3xl font-bold">Files</h1>
         <UploadButton onUpload={handleUpload} />
       </div>
-      <ListImages 
-        images={images}
+      <ListFiles 
+        files={files}
         onDelete={handleDelete}
         onDownload={handleDownload}
       />

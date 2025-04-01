@@ -59,7 +59,7 @@ export const authApi = {
     return Cookies.get(REFRESH_TOKEN_NAME);
   },
 
-  async refreshAccessToken(): Promise<void> {
+  async refreshAccessToken(): Promise<AppResponse<AuthToken>> {
     const refreshToken = this.getRefreshToken();
     if (!refreshToken) {
       throw new Error('No refresh token available');
@@ -67,7 +67,14 @@ export const authApi = {
 
     try {
       const { data } = await api.post('/auth/refresh-token', { refreshToken });
-      Cookies.set(ACCESS_TOKEN_NAME, data.accessToken, { expires: twentyMinutes });
+
+      if(data.succeed){
+        Cookies.set(ACCESS_TOKEN_NAME, data.data.accessToken, { expires: twentyMinutes }); // 20 minutes
+        Cookies.set(REFRESH_TOKEN_NAME, data.data.refreshToken, { expires: sevenDays });
+      }
+
+      return data
+
     } catch (error) {
       this.logout();
       throw error;
@@ -75,37 +82,3 @@ export const authApi = {
   }
 };
 
-// Add request interceptor to include token
-api.interceptors.request.use((config) => {
-  const token = authApi.getAccessToken();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
-// Add response interceptor to handle token refresh
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-
-    // If the error is 401 and we haven't tried to refresh yet
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-
-      try {
-        // Try to refresh the token
-        await authApi.refreshAccessToken();
-        // Retry the original request
-        return api(originalRequest);
-      } catch (refreshError) {
-        // If refresh fails, redirect to login
-        window.location.href = '/login';
-        return Promise.reject(refreshError);
-      }
-    }
-
-    return Promise.reject(error);
-  }
-);

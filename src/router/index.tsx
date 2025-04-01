@@ -3,7 +3,7 @@ import { ProtectedLayout } from '@/layouts/protected-layout'
 import { PublicLayout } from '@/layouts/public-layout'
 import { authRoutes } from './auth'
 import { dashboardRoutes } from './dashboard'
-import { imageRoutes } from './images'
+import { fileRoutes } from './files'
 
 export const router = createBrowserRouter([
   {
@@ -14,6 +14,6 @@ export const router = createBrowserRouter([
   {
     path: '/',
     element: <ProtectedLayout />,
-    children: [...dashboardRoutes, ...imageRoutes],
+    children: [...dashboardRoutes, ...fileRoutes],
   },
 ]) 

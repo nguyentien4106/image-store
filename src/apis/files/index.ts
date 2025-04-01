@@ -1,8 +1,8 @@
 import { api } from "@/services/api";
-import { R2File, UploadImageFormData } from "@/types/images";
+import { R2File, UploadFileFormData } from "@/types/files";
 import { AppResponse } from "@/types";
 
-export interface Image {
+export interface File {
   id: string
   filename: string
   url: string
@@ -11,27 +11,18 @@ export interface Image {
   username: string
 }
 
-export interface UploadImageResponse {
-  message: string
-  image: Image
-}
-
-export interface GetImagesResponse {
-  images: Image[]
-}
-
-const imageApi = {
+const fileApi = {
   /**
    * Upload a new image
    * @param file The image file to upload
    * @returns Promise with upload response
    */
-  uploadImage: async (data: UploadImageFormData): Promise<AppResponse<R2File>> => {
+  uploadFile: async (data: UploadFileFormData): Promise<AppResponse<R2File>> => {
     const formData = new FormData()
     formData.append('file', data.file)
     formData.append('userName', data.userName)
 
-    const response = await api.post<AppResponse<R2File>>('/store/images', formData, {
+    const response = await api.post<AppResponse<R2File>>('/store/files', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -45,8 +36,8 @@ const imageApi = {
    * @param filename The filename of the image
    * @returns Promise with image data
    */
-  getImageByFilename: async (filename: string): Promise<R2File> => {
-    const response = await api.get<R2File>(`/store/images/${filename}`)
+  getFileByFilename: async (filename: string): Promise<R2File> => {
+    const response = await api.get<R2File>(`/store/files/${filename}`)
     return response.data
   },
 
@@ -55,8 +46,8 @@ const imageApi = {
    * @param username The username to get images for
    * @returns Promise with array of images
    */
-  getUserImages: async (username: string): Promise<AppResponse<R2File[]>> => {
-    const response = await api.get<AppResponse<R2File[]>>(`/store/images/users/${username}`)
+  getUserFiles: async (username: string): Promise<AppResponse<R2File[]>> => {
+    const response = await api.get<AppResponse<R2File[]>>(`/store/files/users/${username}`)
     return response.data
   },
 
@@ -65,10 +56,10 @@ const imageApi = {
    * @param url The URL of the image to delete
    * @returns Promise with delete response  
    */
-  deleteImage: async (fileName: string): Promise<AppResponse<R2File>> => {
-    const response = await api.delete<AppResponse<R2File>>(`/store/images?fileName=${fileName}`)
+  deleteFile: async (fileName: string): Promise<AppResponse<R2File>> => {
+    const response = await api.delete<AppResponse<R2File>>(`/store/files?fileName=${fileName}`)
     return response.data
   }
 }
 
-export default imageApi
+export default fileApi
