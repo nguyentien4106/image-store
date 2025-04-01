@@ -29,11 +29,11 @@ export const useDownloadFile = () => {
       document.body.removeChild(link)
       window.URL.revokeObjectURL(blobUrl)
 
-      success("Image downloaded successfully")
+      success("File downloaded successfully")
       return true
     } catch (err) {
-      console.error('Error downloading image:', err)
-      error("Failed to download image. Please try again.")
+      console.error('Error downloading file:', err)
+      error("Failed to download file. Please try again.")
       return false
     }
   }, [success, error])
