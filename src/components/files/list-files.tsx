@@ -3,14 +3,22 @@ import { Button } from "@/components/ui/button"
 import { ImageIcon, Trash2, Download } from "lucide-react"
 import { R2File } from "@/types/files"
 import { getFileName } from "@/lib/utils"
+import Loading from "../loading"
 
 interface ListFilesProps {
   files: R2File[]
   onDelete?: (fileName: string) => void
   onDownload?: (url: string) => void
+  isLoading?: boolean
 }
 
-export function ListFiles({ files, onDelete, onDownload }: ListFilesProps) {
+export function ListFiles({ files, onDelete, onDownload, isLoading }: ListFilesProps) {
+  if (isLoading) {
+    return (
+      <Loading loadingText="Loading images..." />
+    )
+  }
+
   if (files.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -23,7 +31,7 @@ export function ListFiles({ files, onDelete, onDownload }: ListFilesProps) {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      {files.map((file) => {
+      {files?.map((file) => {
         const filename = file.fileName
         return (
           <Card key={filename} className="overflow-hidden">
@@ -32,6 +40,7 @@ export function ListFiles({ files, onDelete, onDownload }: ListFilesProps) {
                 <img
                   src={file.url}
                   alt={filename}
+                  loading="lazy"
                   className="object-cover w-full h-full"
                 />
                 <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
