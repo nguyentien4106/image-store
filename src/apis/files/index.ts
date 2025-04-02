@@ -1,6 +1,7 @@
 import { api } from "@/services/api";
 import { FileInformation, R2File, UploadFileFormData } from "@/types/files";
 import { AppResponse } from "@/types";
+import { StorageSource } from "@/constants/enum";
 
 export interface File {
   id: string
@@ -9,6 +10,14 @@ export interface File {
   createdAt: string
   userId: string
   username: string
+}
+
+const apiPath = {
+  uploadFile: "/files",
+  uploadFileTelegram: "/files/telegram",
+  getFileByFilename: "/files",
+  getUserFiles: "/files/users",
+  deleteFile: "/files",
 }
 
 const fileApi = {
@@ -21,8 +30,8 @@ const fileApi = {
     const formData = new FormData()
     formData.append('file', data.file)
     formData.append('userName', data.userName)
-
-    const response = await api.post<AppResponse<FileInformation>>('/store/files', formData, {
+    const url = data.storageSource === StorageSource.R2 ? apiPath.uploadFile : apiPath.uploadFileTelegram
+    const response = await api.post<AppResponse<FileInformation>>(url, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -37,27 +46,27 @@ const fileApi = {
    * @returns Promise with image data
    */
   getFileByFilename: async (filename: string): Promise<FileInformation> => {
-    const response = await api.get<FileInformation>(`/store/files/${filename}`)
+    const response = await api.get<FileInformation>(`${apiPath.getFileByFilename}?fileName=${filename}`)
     return response.data
   },
 
   /**
-   * Get all images for a specific user
-   * @param username The username to get images for
-   * @returns Promise with array of images
+   * Get all files for a specific user
+   * @param username The username to get files for
+   * @returns Promise with array of files
    */
   getUserFiles: async (username: string): Promise<AppResponse<FileInformation[]>> => {
-    const response = await api.get<AppResponse<FileInformation[]>>(`/store/files/users/${username}`)
+    const response = await api.get<AppResponse<FileInformation[]>>(`${apiPath.getUserFiles}/${username}`)
     return response.data
   },
 
   /**
-   * Delete an image by its URL
-   * @param url The URL of the image to delete
+   * Delete a file by its id
+   * @param id The id of the file to delete
    * @returns Promise with delete response  
    */
-  deleteFile: async (fileName: string): Promise<AppResponse<FileInformation>> => {
-    const response = await api.delete<AppResponse<FileInformation>>(`/store/files?fileName=${fileName}`)
+  deleteFile: async (id: string, storageSource: number): Promise<AppResponse<FileInformation>> => {
+    const response = await api.delete<AppResponse<FileInformation>>(`${apiPath.deleteFile}?id=${id}&storageSource=${storageSource}`)
     return response.data
   }
 }

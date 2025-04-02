@@ -4,6 +4,7 @@ import { authApi } from '@/apis/auth'
 import { Button } from '@/components/ui/button'
 import { LogOut } from 'lucide-react'
 import type { User } from '@/types/auth'
+import { AUTH_PATH, HOME_PATH } from '@/constants/path'
 
 export function ProtectedLayout() {
   const navigate = useNavigate()
@@ -15,7 +16,7 @@ export function ProtectedLayout() {
       const refreshToken = authApi.getRefreshToken()
 
       if (!accessToken && !refreshToken) {
-        navigate('/login')
+        navigate(AUTH_PATH.login)
         return
       }
 
@@ -24,7 +25,7 @@ export function ProtectedLayout() {
         try {
           await authApi.refreshAccessToken()
         } catch (error) {
-          navigate('/login')
+          navigate(AUTH_PATH.login)
           return
         }
       }
@@ -41,7 +42,7 @@ export function ProtectedLayout() {
 
   const handleLogout = () => {
     authApi.logout()
-    navigate('/login')
+    navigate(HOME_PATH.home)
   }
 
   const truncateEmail = (email: string) => {

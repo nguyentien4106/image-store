@@ -1,14 +1,14 @@
-import { LOGIN_PATH } from '@/constants/path'
 import { Login, SignUp } from '@/pages/auth'
+import { AUTH_PATH } from '@/constants/path'
 
 export const authRoutes = [
   {
-    path: LOGIN_PATH.login,
+    path: AUTH_PATH.login,
     index: true,
     element: <Login />,
   },
   {
-    path: LOGIN_PATH.signup,
+    path: AUTH_PATH.signup,
     element: <SignUp />,
   },
 ] 

@@ -8,9 +8,15 @@ const REFRESH_TOKEN_NAME = "refreshToken";
 const twentyMinutes = 1/72;
 const sevenDays = 7;
 
+const apiPath = {
+  login: "/auth/login",
+  register: "/auth/register",
+  refreshToken: "/auth/refresh-token",
+}
+
 export const authApi = {
   async login(request: LoginRequest): Promise<AppResponse<AuthToken>> {
-    const { data } = await api.post("/auth/login", request);
+    const { data } = await api.post(apiPath.login, request);
 
     if(data.succeed){
       Cookies.set(ACCESS_TOKEN_NAME, data.data.accessToken, { expires: twentyMinutes }); // 20 minutes
@@ -21,7 +27,7 @@ export const authApi = {
   },
 
   async signup(request: SignUpRequest): Promise<AppResponse<boolean>> {
-    const { data } = await api.post("/auth/register", request);
+    const { data } = await api.post(apiPath.register, request);
     return data;
   },
 
@@ -66,11 +72,14 @@ export const authApi = {
     }
 
     try {
-      const { data } = await api.post('/auth/refresh-token', { refreshToken });
+      const { data } = await api.post(apiPath.refreshToken, { refreshToken });
 
       if(data.succeed){
         Cookies.set(ACCESS_TOKEN_NAME, data.data.accessToken, { expires: twentyMinutes }); // 20 minutes
         Cookies.set(REFRESH_TOKEN_NAME, data.data.refreshToken, { expires: sevenDays });
+      }
+      else {
+        throw new Error(data.message);
       }
 
       return data
