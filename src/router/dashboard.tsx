@@ -1,4 +1,4 @@
-import { DashboardPage } from '@/pages/dashboard/DashboardPage'
+import DashboardPage from '@/pages/dashboard'
 
 export const dashboardRoutes = [
   {
