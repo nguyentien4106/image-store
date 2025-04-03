@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Check, Cloud, Database, FileText, Lock, Shield, Upload } from "lucide-react"
 import { scrollToSection } from "@/lib/utils"
 import { AUTH_PATH } from "@/constants/path"
+import image from "@/assets/cloud-storage.png"
 
 // Define TypeScript interfaces for component props
 interface FeatureCardProps {
@@ -99,9 +100,11 @@ export default function LandingPage(): React.ReactElement {
             <div className="mt-16 relative w-full max-w-4xl">
               <div className="rounded-lg border bg-background p-2 shadow-lg">
                 <img
-                  src="/placeholder.svg?height=600&width=1200"
+                  src={image}
                   alt="CloudStore Dashboard Preview"
-                  className="rounded border w-full h-auto"
+                  className="rounded border w-full h-auto object-cover"
+                  loading="eager"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 1200px"
                   width={1200}
                   height={600}
                 />

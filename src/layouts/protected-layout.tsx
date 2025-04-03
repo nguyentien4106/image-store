@@ -61,7 +61,7 @@ export function ProtectedLayout() {
     <div className="min-h-screen bg-background">
       <header className="border-b">
         <div className="container mx-auto h-16 flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-primary">EStore</h1>
+          <h1 className="text-3xl font-bold text-primary">CloudStore</h1>
           <div className="flex items-center gap-1">
             {user && (
               <>
