@@ -17,8 +17,8 @@ export function FileCard({ file, onDownload, onDelete }: FileCardProps) {
   const isImage = file.fileType === FileType.Image
 
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="p-0">
+    <Card className="overflow-hidden flex flex-col h-full">
+      <CardHeader className="p-0 flex-none">
         <div className="aspect-square relative">
           {isImage ? (
             <img
@@ -58,8 +58,8 @@ export function FileCard({ file, onDownload, onDelete }: FileCardProps) {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="p-4">
-        <div className="flex items-center gap-2">
+      <CardContent className="p-4 flex-grow flex flex-col justify-center">
+        <div className="flex items-center gap-2 mb-1">
           {getFileTypeIcon(file.fileType)}
           <h3 className="font-medium truncate">{getFileName(file.fileName)}</h3>
         </div>
@@ -67,15 +67,13 @@ export function FileCard({ file, onDownload, onDelete }: FileCardProps) {
           {getDateTimeString(file.createdAt)}
         </p>
       </CardContent>
-      <CardFooter className="p-4 pt-0">
+      <CardFooter className="p-4 pt-0 flex-none">
         <div className="flex justify-between items-center w-full">
           <span className="text-sm text-gray-500">
             {file.fileSize} MB
           </span>
           <span className="text-sm text-gray-500">
-            {
-              getStorageSourceIcon(file.storageSource)
-            }
+            {getStorageSourceIcon(file.storageSource)}
           </span>
         </div>
       </CardFooter>
