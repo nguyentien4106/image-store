@@ -20,9 +20,10 @@ interface FileCardProps {
 }
 
 export function FileCard({ file, onDownload, onDelete }: FileCardProps) {
+  console.log(file)
   return (
     <Card className="overflow-hidden flex flex-col h-full">
-      <CardAction>
+      <CardAction className="w-full">
         <div className="flex items-center justify-center gap-3">
           {onDownload && (
             <Button

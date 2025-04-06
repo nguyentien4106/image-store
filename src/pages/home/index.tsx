@@ -6,7 +6,7 @@ import { Check, Cloud, Database, FileText, Lock, Shield, Upload } from "lucide-r
 import { scrollToSection } from "@/lib/utils"
 import { AUTH_PATH } from "@/constants/path"
 import image from "@/assets/cloud-storage.png"
-
+import { getCompanyIcon } from "@/lib/icons"
 // Define TypeScript interfaces for component props
 interface FeatureCardProps {
   icon: React.ReactNode
@@ -300,10 +300,7 @@ export default function LandingPage(): React.ReactElement {
         <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Cloud className="h-6 w-6 text-primary" />
-                <span className="text-xl font-bold">CloudStore</span>
-              </div>
+              {getCompanyIcon()}
               <p className="text-sm text-muted-foreground">
                 Secure cloud storage for all your files. Access anywhere, anytime.
               </p>

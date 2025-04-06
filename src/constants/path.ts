@@ -10,3 +10,7 @@ export const FILES_PATH = {
 export const HOME_PATH = {
     home: '/',
 }
+
+export const DASHBOARD_PATH = {
+    dashboard: "/dashboard"
+}

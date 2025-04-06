@@ -1,17 +1,15 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useNavigate, Outlet } from 'react-router-dom'
 import { authApi } from '@/apis/auth'
-import { Button } from '@/components/ui/button'
-import { LogOut } from 'lucide-react'
-import type { User } from '@/types/auth'
-import { AUTH_PATH, HOME_PATH } from '@/constants/path'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '@/store'
 import { setUser } from '@/store/slices/userSlice'
+import { AppSidebar } from "@/components/app-sidebar"
+import { SidebarProvider } from "@/components/ui/sidebar"
+import { AUTH_PATH } from '@/constants/path'
 
 export function ProtectedLayout() {
   const navigate = useNavigate()
-  // const [user, setUser] = useState<User | null>(null)    
   const { user } = useSelector((state: RootState) => state.user)
   const dispatch = useDispatch()
 
@@ -19,13 +17,13 @@ export function ProtectedLayout() {
     const checkAuth = async () => {
       const accessToken = authApi.getAccessToken()
       const refreshToken = authApi.getRefreshToken()
-
+      console.log(accessToken, refreshToken)
       if (!accessToken && !refreshToken) {
+        dispatch(setUser(null))
         navigate(AUTH_PATH.login)
         return
       }
 
-      // If we have a refresh token but no access token, try to refresh
       if (!accessToken && refreshToken) {
         try {
           await authApi.refreshAccessToken()
@@ -35,7 +33,6 @@ export function ProtectedLayout() {
         }
       }
 
-      // Get user information from token
       const userInfo = authApi.getCurrentUser()
       if (userInfo) {
         dispatch(setUser(userInfo))
@@ -43,54 +40,16 @@ export function ProtectedLayout() {
     }
 
     checkAuth()
-  }, [])
-
-  const handleLogout = () => {
-    authApi.logout()
-    navigate(HOME_PATH.home)
-  }
-
-  const truncateEmail = (email: string) => {
-    const atIndex = email.indexOf('@')
-    if (atIndex === -1) return email
-
-    const username = email.substring(0, atIndex)
-    const domain = email.substring(atIndex)
-    
-    // Show first 30% of username + @domain
-    const truncatedUsername = username.substring(0, Math.ceil(username.length * 0.3))
-    return `${truncatedUsername}...${domain}`
-  }
+  }, [dispatch, navigate])
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b">
-        <div className="container mx-auto h-16 flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-primary">CloudStore</h1>
-          <div className="flex items-center gap-1">
-            {user && (
-              <>
-                <span className="text-sm text-muted-foreground">
-                  <span className="md:hidden">{truncateEmail(user.email)}</span>
-                  <span className="hidden md:inline">{user.email}</span>
-                </span>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={handleLogout}
-                  className="flex items-center"
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span className="hidden sm:inline">Logout</span>
-                </Button>
-              </>
-            )}
-          </div>
-        </div>
-      </header>
-      <main className="container mx-auto py-6">
-        <Outlet />
-      </main>
-    </div>
+    <SidebarProvider>
+      <div className="flex">
+        <AppSidebar variant="inset" />
+        <main className="flex-1">
+          <Outlet />
+        </main>
+      </div>
+    </SidebarProvider>
   )
 } 

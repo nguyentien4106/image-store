@@ -5,6 +5,7 @@ import { fileRoutes } from './files'
 import ErrorPage from '@/pages/error'
 import HomePage from '@/pages/home'
 import { ProtectedLayout } from '@/layouts/protected-layout'
+import AuthLayout from '@/layouts/auth-layout'
 
 export const router = createBrowserRouter([
   {
@@ -14,6 +15,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/',
+    element: <AuthLayout />,
     children: authRoutes,
     errorElement: <ErrorPage />,
   },
