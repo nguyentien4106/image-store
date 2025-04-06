@@ -5,10 +5,15 @@ import { Button } from '@/components/ui/button'
 import { LogOut } from 'lucide-react'
 import type { User } from '@/types/auth'
 import { AUTH_PATH, HOME_PATH } from '@/constants/path'
+import { useDispatch, useSelector } from 'react-redux'
+import { RootState } from '@/store'
+import { setUser } from '@/store/slices/userSlice'
 
 export function ProtectedLayout() {
   const navigate = useNavigate()
-  const [user, setUser] = useState<User | null>(null)
+  // const [user, setUser] = useState<User | null>(null)    
+  const { user } = useSelector((state: RootState) => state.user)
+  const dispatch = useDispatch()
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -33,7 +38,7 @@ export function ProtectedLayout() {
       // Get user information from token
       const userInfo = authApi.getCurrentUser()
       if (userInfo) {
-        setUser(userInfo)
+        dispatch(setUser(userInfo))
       }
     }
 

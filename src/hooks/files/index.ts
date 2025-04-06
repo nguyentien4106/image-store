@@ -4,13 +4,13 @@ import { useNotification } from '../notification'
 export const useDownloadFile = () => {
   const { success, error } = useNotification()
 
-  const downloadFile = useCallback(async (url: string) => {
+  const downloadFile = useCallback(async (url: string, contentType: string, fileName: string) => {
     try {
       const response = await fetch(url, {
         method: 'GET',
         headers: {
           'Accept': 'image/*',
-          'Content-Type': 'application/octet-stream',
+          'Content-Type': contentType,
         },
         mode: 'cors',
       })
@@ -23,7 +23,7 @@ export const useDownloadFile = () => {
       const blobUrl = window.URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = blobUrl
-      link.download = url.split('/').pop() || 'image'
+      link.download = fileName
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
@@ -32,8 +32,7 @@ export const useDownloadFile = () => {
       success("File downloaded successfully")
       return true
     } catch (err) {
-      console.error('Error downloading file:', err)
-      error("Failed to download file. Please try again.")
+      error("Failed to download file. Please try again. " + err.message)
       return false
     }
   }, [success, error])

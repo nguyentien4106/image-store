@@ -1,17 +1,17 @@
-import { Button } from "@/components/ui/button"
-import { Upload } from "lucide-react"
+import { Button } from "@/components/ui/button";
+import { Upload } from "lucide-react";
 
 interface UploadButtonProps {
-  onUpload: (files: File) => void
+  onUpload: (file: File) => void;
 }
 
 export function UploadButton({ onUpload }: UploadButtonProps) {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files
+    const files = event.target.files;
     if (files?.length) {
-      onUpload(files[0])
+      onUpload(files[0]);
     }
-  }
+  };
 
   return (
     <div className="relative">
@@ -29,5 +29,5 @@ export function UploadButton({ onUpload }: UploadButtonProps) {
         </label>
       </Button>
     </div>
-  )
+  );
 }

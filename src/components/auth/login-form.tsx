@@ -17,6 +17,7 @@ import { startLoading, stopLoading } from "@/store/slices/loadingSlice"
 import { useNotification } from "@/hooks/notification"
 import { LoginRequest } from "@/types/auth"
 import { FILES_PATH } from "@/constants/path"
+import { setUser } from "@/store/slices/userSlice"
 export function LoginForm({
   className,
   ...props
@@ -38,6 +39,7 @@ export function LoginForm({
       if(!result.succeed){
         error(result.message)
       } else {
+        setUser(authApi.getCurrentUser())
         navigate(FILES_PATH.files)
       }
     } catch (err) {

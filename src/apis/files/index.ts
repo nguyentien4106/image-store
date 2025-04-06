@@ -1,5 +1,5 @@
 import { api } from "@/services/api";
-import { FileInformation, R2File, UploadFileFormData } from "@/types/files";
+import { DeleteFileRequest, DownloadFileRequest, DownloadFileResponse, FileInformation, R2File, UploadFileFormData } from "@/types/files";
 import { AppResponse } from "@/types";
 import { StorageSource } from "@/constants/enum";
 
@@ -18,6 +18,7 @@ const apiPath = {
   getFileByFilename: "/files",
   getUserFiles: "/files/users",
   deleteFile: "/files",
+  downloadFile: "/files/download"
 }
 
 const fileApi = {
@@ -30,8 +31,10 @@ const fileApi = {
     const formData = new FormData()
     formData.append('file', data.file)
     formData.append('userName', data.userName)
-    const url = data.storageSource === StorageSource.R2 ? apiPath.uploadFile : apiPath.uploadFileTelegram
-    const response = await api.post<AppResponse<FileInformation>>(url, formData, {
+    formData.append('width', "1280")
+    formData.append('height', "720")
+    formData.append('storageSource', data.storageSource.toString())
+    const response = await api.post<AppResponse<FileInformation>>(apiPath.uploadFile, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -65,10 +68,49 @@ const fileApi = {
    * @param id The id of the file to delete
    * @returns Promise with delete response  
    */
-  deleteFile: async (id: string, storageSource: number): Promise<AppResponse<FileInformation>> => {
-    const response = await api.delete<AppResponse<FileInformation>>(`${apiPath.deleteFile}?id=${id}&storageSource=${storageSource}`)
+  deleteFile: async (request: DeleteFileRequest): Promise<AppResponse<string>> => {
+    const response = await api.delete<AppResponse<string>>(apiPath.deleteFile, { data: request })
     return response.data
+  },
+
+  /**
+   * Download a file by its id
+   * @param id The id of the file to download
+   * @param storageSource The storage source of the file
+   * @returns Promise<void> - Triggers browser download
+   */
+  downloadFile: async (data: DownloadFileRequest): Promise<AppResponse<DownloadFileResponse> | undefined> => {
+    if(data.storageSource == StorageSource.R2){
+      var result = await api.post<AppResponse<DownloadFileResponse>>(apiPath.downloadFile, data);
+      return result.data;
+    }
+    
+    const response = await api.post(apiPath.downloadFile, data, {
+      responseType: 'blob',
+    });
+
+    const contentDisposition = response.headers['content-disposition'];
+    let fileName = 'downloaded-file';
+    if (contentDisposition && contentDisposition.includes('filename=')) {
+      const match = contentDisposition.match(/filename="([^"]+)"/) || contentDisposition.match(/filename=([^;]+)/);;
+      if (match) {
+        fileName = decodeURIComponent(match[1])
+      }
+    }
+
+    const blob = new Blob([response.data]);
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    window.URL.revokeObjectURL(url);
   }
+
 }
 
 export default fileApi

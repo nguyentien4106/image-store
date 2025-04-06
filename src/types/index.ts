@@ -7,4 +7,5 @@ export interface AppResponse<T> {
 export interface LoadingState {
   isLoading: boolean
   loadingText?: string
+  isSmall: boolean
 } 

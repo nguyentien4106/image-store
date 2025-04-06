@@ -5,7 +5,7 @@ import { useNotification } from "@/hooks/notification"
 import fileApi from "@/apis/files"
 import { RootState } from "@/store"
 import { useDispatch, useSelector } from "react-redux"
-import { FileInformation } from "@/types/files"
+import { DownloadFileResponse, FileInformation } from "@/types/files"
 import { useDownloadFile } from "@/hooks/files"
 import { setLoading } from "@/store/slices/loadingSlice"
 import { StorageSource } from "@/constants/enum"
@@ -16,6 +16,7 @@ import {
     SelectTrigger,
     SelectValue,
   } from "@/components/ui/select"
+import { AppResponse } from "@/types"
 
 export default function FilesPage() {
     const { success, error } = useNotification()
@@ -40,7 +41,10 @@ export default function FilesPage() {
         if(user?.userName){
             try {
                 dispatch(setLoading({ isLoading: true }))
-                const result = await fileApi.deleteFile(id, source)
+                const result = await fileApi.deleteFile({
+                    id: id,
+                    storageSource: source
+                })
                 if (result.succeed) {
                     setFiles(files.filter(file => file.id !== id))
                     success("File deleted successfully")
@@ -55,14 +59,23 @@ export default function FilesPage() {
         }
     }
 
-    const handleDownload = async (url: string) => {
-        await downloadFile(url)
+    const handleDownload = async (id: string, storageSource: StorageSource, fileName: string) => {
+        if(user?.userName){
+            if(storageSource == StorageSource.Telegram){
+                await fileApi.downloadFile({ id, storageSource })
+            }
+            else {
+                const result: AppResponse<DownloadFileResponse> = await fileApi.downloadFile({ id, storageSource });
+                await downloadFile(result.data.filePath, result.data.contentType, fileName)
+
+            }
+        }
     }
 
     const handleUpload = async (file: File) => {
         if(user?.userName){
             try {
-                dispatch(setLoading({ isLoading: true }))
+                dispatch(setLoading({ isLoading: true, isSmall: true, loadingText: "Uploading file" }))
                 const res = await fileApi.uploadFile({
                     file: file,
                     userName: user?.userName,

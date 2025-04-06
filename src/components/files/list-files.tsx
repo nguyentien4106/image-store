@@ -1,11 +1,12 @@
 import { FileCard } from "./file-card"
 import { FileInformation } from "@/types/files"
 import Loading from "../loading"
+import { StorageSource } from "@/constants/enum"
 
 interface ListFilesProps {
   files?: FileInformation[]
   onDelete?: (id: string, storageSource: number) => void
-  onDownload?: (url: string) => void
+  onDownload?: (id: string, StorageSource: StorageSource, fileName: string) => void
   isLoading?: boolean
 }
 

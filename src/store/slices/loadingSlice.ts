@@ -5,15 +5,17 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 const initialState: LoadingState = {
   isLoading: false,
   loadingText: undefined,
+  isSmall: false
 }
 
 const loadingSlice = createSlice({
   name: 'loading',
   initialState,
   reducers: {
-    setLoading: (state, action: PayloadAction<{ isLoading: boolean; loadingText?: string }>) => {
+    setLoading: (state, action: PayloadAction<{ isLoading: boolean; loadingText?: string, isSmall?: boolean}>) => {
       state.isLoading = action.payload.isLoading
       state.loadingText = action.payload.loadingText
+      state.isSmall = action.payload.isSmall ?? false
     },
     startLoading: (state, action: PayloadAction<string>) => {
       state.isLoading = true
