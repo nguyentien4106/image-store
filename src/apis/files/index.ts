@@ -1,6 +1,6 @@
 import { api } from "@/services/api";
-import { DeleteFileRequest, DownloadFileRequest, DownloadFileResponse, FileInformation, R2File, UploadFileFormData } from "@/types/files";
-import { AppResponse } from "@/types";
+import { DeleteFileRequest, DownloadFileRequest, DownloadFileResponse, FileInformation, UploadFileFormData } from "@/types/files";
+import { AppResponse, PaginatedResult } from "@/types";
 import { StorageSource } from "@/constants/enum";
 
 export interface File {
@@ -58,8 +58,8 @@ const fileApi = {
    * @param username The username to get files for
    * @returns Promise with array of files
    */
-  getUserFiles: async (username: string): Promise<AppResponse<FileInformation[]>> => {
-    const response = await api.get<AppResponse<FileInformation[]>>(`${apiPath.getUserFiles}/${username}`)
+  getUserFiles: async (username: string): Promise<AppResponse<PaginatedResult<FileInformation>>> => {
+    const response = await api.get<AppResponse<PaginatedResult<FileInformation>>>(`${apiPath.getUserFiles}/${username}?pageIndex=${0}&pageSize=${20}`)
     return response.data
   },
 

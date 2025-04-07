@@ -35,5 +35,5 @@ export function scrollToSection(sectionId: string) {
 }
 
 export const getFileSizeInMb = (size: number) => {
-  return "Size: " + (size / (1024 * 1024)).toFixed(2) + ' MB';
+  return (size / (1024 * 1024)).toFixed(2) + ' MB';
 }

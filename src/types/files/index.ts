@@ -19,11 +19,6 @@ export interface DownloadFileResponse{
     contentType: string
 }
 
-export interface R2File {
-    url: string
-    fileName: string
-}
-
 export interface FileInformation{
     id: string
     fileName: string
@@ -35,3 +30,4 @@ export interface FileInformation{
     userId: string
     createdAt: string
 }
+

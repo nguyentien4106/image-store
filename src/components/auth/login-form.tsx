@@ -39,7 +39,7 @@ export function LoginForm({
       if(!result.succeed){
         error(result.message)
       } else {
-        setUser(authApi.getCurrentUser())
+        dispatch(setUser(authApi.getCurrentUser()))
         navigate(FILES_PATH.files)
       }
     } catch (err) {

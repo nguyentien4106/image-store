@@ -27,7 +27,7 @@ export function getStorageSourceIcon(source: StorageSource) {
         <div className="flex items-center space-x-2">
           <Tooltip>
             <TooltipTrigger asChild>
-              <HelpCircle className="h-4 w-4 text-gray-500" />
+              <HelpCircle className="h-5 w-5 text-gray-500" />
             </TooltipTrigger>
             <TooltipContent>
               <p>Free storage, not guaranteed</p>

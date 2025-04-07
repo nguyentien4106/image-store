@@ -5,7 +5,7 @@ import { useNotification } from "@/hooks/notification"
 import fileApi from "@/apis/files"
 import { RootState } from "@/store"
 import { useDispatch, useSelector } from "react-redux"
-import { DownloadFileResponse, FileInformation } from "@/types/files"
+import { FileInformation } from "@/types/files"
 import { useDownloadFile } from "@/hooks/files"
 import { setLoading } from "@/store/slices/loadingSlice"
 import { StorageSource } from "@/constants/enum"
@@ -16,7 +16,6 @@ import {
     SelectTrigger,
     SelectValue,
   } from "@/components/ui/select"
-import { AppResponse } from "@/types"
 
 export default function FilesPage() {
     const { success, error } = useNotification()
@@ -31,7 +30,7 @@ export default function FilesPage() {
     useEffect(() => {
         if (user?.userName) {
             fileApi.getUserFiles(user?.userName).then((res) => {
-                setFiles(res.data)
+                setFiles(res.data.data)
                 setIsLoading(false)
             })
         }
@@ -65,8 +64,13 @@ export default function FilesPage() {
                 await fileApi.downloadFile({ id, storageSource })
             }
             else {
-                const result: AppResponse<DownloadFileResponse> = await fileApi.downloadFile({ id, storageSource });
-                await downloadFile(result.data.filePath, result.data.contentType, fileName)
+                const result = await fileApi.downloadFile({ id, storageSource });
+                if(result){
+                    await downloadFile(result.data.filePath, result.data.contentType, fileName)
+                }
+                else {
+                    error("Failed to download file")
+                }
 
             }
         }
@@ -82,6 +86,7 @@ export default function FilesPage() {
                     storageSource: storageSource
                 })
                 if (res.succeed) {
+                    console.log(res.data)
                     setFiles([res.data, ...files])
                     success("File uploaded successfully")
                 } else {
@@ -98,7 +103,6 @@ export default function FilesPage() {
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
-                <h1 className="text-3xl font-bold">Files</h1>
                 <div className="flex items-center gap-4">
                     <Select defaultValue={StorageSource.R2.toString()} onValueChange={(value) => setStorageSource(Number(value))}>
                         <SelectTrigger>

@@ -1,6 +1,5 @@
 import { User } from '@/types/auth'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { stat } from 'fs'
 import Cookies from 'js-cookie'
 
 // Helper function to parse JWT token
@@ -48,7 +47,7 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     setUser: (state, action: PayloadAction<User | null>) => {
-      state.user = Object.assign({}, action.payload)
+      state.user = action.payload
     },
     clearUser: (state) => {
       state.user = null

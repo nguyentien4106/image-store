@@ -9,3 +9,16 @@ export interface LoadingState {
   loadingText?: string
   isSmall: boolean
 } 
+
+export interface SidebarItem {
+  title: string
+  href: string
+  icon: React.ElementType
+}
+
+export interface PaginatedResult<T> {
+  pageIndex: number,
+  pageSize: number,
+  count: number
+  data: T[]
+}
