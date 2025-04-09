@@ -2,6 +2,8 @@ export interface UploadFileFormData {
     file: File
     userName: string
     storageSource: number
+    accountType: string
+    onProgress: (percentCompleted: number) => void;
 }
 
 export interface DeleteFileRequest{

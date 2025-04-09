@@ -14,3 +14,9 @@ export enum FileType {
     System = 7,
     Unknown = 8
 }
+
+export enum AccountType {
+    Free = "Free",
+    Pro = "Pro",
+    Plus = "Plus",
+}

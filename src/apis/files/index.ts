@@ -2,6 +2,7 @@ import { api } from "@/services/api";
 import { DeleteFileRequest, DownloadFileRequest, DownloadFileResponse, FileInformation, UploadFileFormData } from "@/types/files";
 import { AppResponse, PaginatedResult } from "@/types";
 import { StorageSource } from "@/constants/enum";
+import { AxiosProgressEvent } from "axios";
 
 export interface File {
   id: string
@@ -13,9 +14,7 @@ export interface File {
 }
 
 const apiPath = {
-  uploadFile: "/files",
-  uploadFileTelegram: "/files/telegram",
-  getFileByFilename: "/files",
+  uploadFile: "/files/",
   getUserFiles: "/files/users",
   deleteFile: "/files",
   downloadFile: "/files/download"
@@ -28,29 +27,37 @@ const fileApi = {
    * @returns Promise with upload response
    */
   uploadFile: async (data: UploadFileFormData): Promise<AppResponse<FileInformation>> => {
-    const formData = new FormData()
+    try{
+      const formData = new FormData()
     formData.append('file', data.file)
     formData.append('userName', data.userName)
-    formData.append('width', "1280")
-    formData.append('height', "720")
     formData.append('storageSource', data.storageSource.toString())
-    const response = await api.post<AppResponse<FileInformation>>(apiPath.uploadFile, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    })
+    formData.append('accountType', data.accountType)
+    
+    const response = await api.post<AppResponse<FileInformation>>(
+      apiPath.uploadFile + data.accountType.toLowerCase(), 
+      formData, 
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        timeout: 6000000, // 10 minutes to handle large files
+        onUploadProgress: (progressEvent: AxiosProgressEvent) => {
+          if (progressEvent.total) {
+            const percentCompleted = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total
+            );
+            data.onProgress(percentCompleted);
+          }
+        }
+      }
+    )
 
-    return response.data
-  },
-
-  /**
-   * Get an image by its filename
-   * @param filename The filename of the image
-   * @returns Promise with image data
-   */
-  getFileByFilename: async (filename: string): Promise<FileInformation> => {
-    const response = await api.get<FileInformation>(`${apiPath.getFileByFilename}?fileName=${filename}`)
-    return response.data
+      return response.data
+    } catch (error: any) {
+      console.error("Error uploading file:", error.response.data);
+      throw error
+    }
   },
 
   /**

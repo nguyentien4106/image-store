@@ -2,23 +2,19 @@ export interface User {
     userId: string
     userName: string
     email: string
+    accountType: string
+    firstName: string
+    lastName: string
     aud: string
     exp: number
     iss: string
-  }
+}
   
-  export interface AuthToken {
-    accessToken: string
-    refreshToken: string
-  }
+export interface AuthToken {
+  accessToken: string
+  refreshToken: string
+}
   
-  export interface AuthState {
-    user: User | null
-    isAuthenticated: boolean
-    isLoading: boolean
-    error: string | null
-  }
-
 export interface SignUpRequest{
     email: string
     userName: string

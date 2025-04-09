@@ -6,9 +6,8 @@ import fileApi from "@/apis/files"
 import { RootState } from "@/store"
 import { useDispatch, useSelector } from "react-redux"
 import { FileInformation } from "@/types/files"
-import { useDownloadFile } from "@/hooks/files"
 import { setLoading } from "@/store/slices/loadingSlice"
-import { StorageSource } from "@/constants/enum"
+import { AccountType, StorageSource } from "@/constants/enum"
 import {
     Select,
     SelectContent,
@@ -16,18 +15,21 @@ import {
     SelectTrigger,
     SelectValue,
   } from "@/components/ui/select"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { CrownIcon } from "lucide-react"
 
 export default function FilesPage() {
     const { success, error } = useNotification()
-    const { downloadFile } = useDownloadFile()
     const { user } = useSelector((state: RootState) => state.user)
     const [files, setFiles] = useState<FileInformation[]>([])
     const [isLoading, setIsLoading] = useState(true)
-    const [storageSource, setStorageSource] = useState(StorageSource.R2)
+    const [storageSource, setStorageSource] = useState(user?.accountType == AccountType.Free ? StorageSource.Telegram : StorageSource.R2)
+    const [uploadProgress, setUploadProgress] = useState(0)
     
     const dispatch = useDispatch()
 
     useEffect(() => {
+        console.log(user)
         if (user?.userName) {
             fileApi.getUserFiles(user?.userName).then((res) => {
                 setFiles(res.data.data)
@@ -39,7 +41,7 @@ export default function FilesPage() {
     const handleDelete = async (id: string, source: number) => {
         if(user?.userName){
             try {
-                dispatch(setLoading({ isLoading: true }))
+                dispatch(setLoading({ isLoading: true, loadingText: "Deleting file", isSmall: true }))
                 const result = await fileApi.deleteFile({
                     id: id,
                     storageSource: source
@@ -48,31 +50,20 @@ export default function FilesPage() {
                     setFiles(files.filter(file => file.id !== id))
                     success("File deleted successfully")
                 } else {
+                    console.log(result)
                     error(result.message)
                 }
             } catch (err) {
                 error("Failed to delete file") 
             } finally {
-                dispatch(setLoading({ isLoading: false }))
+                dispatch(setLoading({ isLoading: false, isSmall: false }))
             }
         }
     }
 
-    const handleDownload = async (id: string, storageSource: StorageSource, fileName: string) => {
+    const handleDownload = async (id: string, storageSource: StorageSource) => {
         if(user?.userName){
-            if(storageSource == StorageSource.Telegram){
-                await fileApi.downloadFile({ id, storageSource })
-            }
-            else {
-                const result = await fileApi.downloadFile({ id, storageSource });
-                if(result){
-                    await downloadFile(result.data.filePath, result.data.contentType, fileName)
-                }
-                else {
-                    error("Failed to download file")
-                }
-
-            }
+            await fileApi.downloadFile({ id, storageSource })
         }
     }
 
@@ -83,16 +74,21 @@ export default function FilesPage() {
                 const res = await fileApi.uploadFile({
                     file: file,
                     userName: user?.userName,
-                    storageSource: storageSource
+                    storageSource: storageSource,
+                    accountType: user?.accountType,
+                    onProgress: (percentCompleted) => {
+                        setUploadProgress(percentCompleted)
+                    }
                 })
+                console.log('res',res)
                 if (res.succeed) {
-                    console.log(res.data)
                     setFiles([res.data, ...files])
                     success("File uploaded successfully")
                 } else {
                     error(res.message)
                 }
             } catch (err) {
+                console.log('err',err)
                 error("Failed to upload file")
             } finally {
                 dispatch(setLoading({ isLoading: false }))
@@ -104,18 +100,37 @@ export default function FilesPage() {
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <div className="flex items-center gap-4">
-                    <Select defaultValue={StorageSource.R2.toString()} onValueChange={(value) => setStorageSource(Number(value))}>
+                    <Select defaultValue={storageSource.toString()} onValueChange={(value) => setStorageSource(Number(value))}>
                         <SelectTrigger>
                             <SelectValue placeholder="Select storage" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value={StorageSource.R2.toString()}>Cloudflare R2</SelectItem>
                             <SelectItem value={StorageSource.Telegram.toString()}>Telegram</SelectItem>
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <div>
+                                            <SelectItem 
+                                                disabled={user?.accountType == AccountType.Free} 
+                                                value={StorageSource.R2.toString()}
+                                            >
+                                            Cloudflare R2 <CrownIcon className="w-4 h-4" color="#FFD700" size={20}/>
+                                            </SelectItem>
+                                        </div>
+                                    </TooltipTrigger>
+                                    {user?.accountType == AccountType.Free && (
+                                        <TooltipContent>
+                                            <p>Upgrade to a paid plan to use Cloudflare R2 storage </p>
+                                        </TooltipContent>
+                                    )}
+                                </Tooltip>
+                            </TooltipProvider>
                         </SelectContent>
                     </Select>
                     <UploadButton onUpload={handleUpload} />
                 </div>
             </div>
+            
             <ListFiles
                 files={files}
                 onDelete={handleDelete}

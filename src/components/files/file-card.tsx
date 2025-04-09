@@ -4,13 +4,12 @@ import {
   CardAction,
   CardContent,
   CardFooter,
-  CardHeader,
 } from "@/components/ui/card";
 import { Download, Trash2 } from "lucide-react";
-import { getDateTimeString, getFileName, getFileSizeInMb } from "@/lib/utils";
+import { getDateTimeString, getFileSizeInMb } from "@/lib/utils";
 import { getFileTypeIcon } from "@/lib/icons";
 import { FileInformation } from "@/types/files";
-import { FileType, StorageSource } from "@/constants/enum";
+import { StorageSource } from "@/constants/enum";
 import { getStorageSourceIcon } from "@/helpers";
 import {
   AlertDialog,
@@ -26,7 +25,7 @@ import {
 
 interface FileCardProps {
   file: FileInformation;
-  onDownload?: (id: string, StorageSource: StorageSource, fileName: string) => void;
+  onDownload?: (id: string, storageSource: StorageSource) => void;
   onDelete?: (id: string, source: number) => void;
 }
 
@@ -39,7 +38,7 @@ export function FileCard({ file, onDownload, onDelete }: FileCardProps) {
             <Button
               variant="secondary"
               size="icon"
-              onClick={() => onDownload(file.id, file.storageSource, file.fileName)}
+              onClick={() => onDownload(file.id, file.storageSource)}
               className="bg-green hover:bg-white shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer"
             >
               <Download className="h-5 w-5" />
