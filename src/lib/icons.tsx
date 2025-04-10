@@ -5,16 +5,11 @@ import {
   Music,
   Video,
   FileArchive,
-  Settings,
   HelpCircle,
   Code,
   Database,
   Globe,
-  Shield,
-  BookOpen,
   Terminal,
-  Layers,
-  ClipboardList,
   FileSpreadsheet,
   Cloud,
 } from "lucide-react";
@@ -23,7 +18,6 @@ import { HOME_PATH } from "@/constants/path";
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 

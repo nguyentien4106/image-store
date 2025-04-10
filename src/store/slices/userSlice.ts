@@ -25,6 +25,9 @@ const parseJwtToken = (token: string): User | null => {
         exp: payload.exp,
         iss: payload.iss,
         aud: payload.aud,
+        accountType: payload.accountType,
+        firstName: payload.firstName,
+        lastName: payload.lastName
       }
   
       return user

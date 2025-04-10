@@ -55,8 +55,8 @@ const fileApi = {
 
       return response.data
     } catch (error: any) {
-      console.error("Error uploading file:", error.response.data);
-      throw error
+      console.error("Error uploading file:", error);
+      return error.response.data 
     }
   },
 

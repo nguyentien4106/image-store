@@ -70,10 +70,10 @@ export default function LandingPage(): React.ReactElement {
             </Link>
           </nav>
           <div className="flex items-center gap-4">
-            <Button variant="outline" size="sm" className="cursor-pointer" onClick={(e) => navigate(AUTH_PATH.login)}>
+            <Button variant="outline" size="sm" className="cursor-pointer" onClick={() => navigate(AUTH_PATH.login)}>
               Log in
             </Button>
-            <Button size="sm" className="cursor-pointer" onClick={(e) => navigate(AUTH_PATH.signup)}>Sign up</Button>
+            <Button size="sm" className="cursor-pointer" onClick={() => navigate(AUTH_PATH.signup)}>Sign up</Button>
           </div>
         </div>
       </header>
@@ -285,7 +285,7 @@ export default function LandingPage(): React.ReactElement {
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
                 Join thousands of satisfied users who trust CloudStore with their important files.
               </p>
-              <Button size="lg" className="px-8 cursor-pointer" onClick={(e) => navigate(AUTH_PATH.signup)}>
+              <Button size="lg" className="px-8 cursor-pointer" onClick={() => navigate(AUTH_PATH.signup)}>
                 Sign Up for Free
               </Button>
               <p className="mt-4 text-sm text-muted-foreground">

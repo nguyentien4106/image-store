@@ -1,12 +1,10 @@
 import { authApi } from '@/apis/auth';
 import { AuthNavbar } from '@/components/auth-navbar';
 import { DASHBOARD_PATH } from '@/constants/path';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 
-interface Props {}
-
-function AuthLayout(props: Props) {
+function AuthLayout() {
     const navigate = useNavigate()
 
     useEffect(() => {

@@ -70,7 +70,7 @@ export default function FilesPage() {
     const handleUpload = async (file: File) => {
         if(user?.userName){
             try {
-                dispatch(setLoading({ isLoading: true, isSmall: true, loadingText: "Uploading file" }))
+                dispatch(setLoading({ isLoading: true, isSmall: true, loadingText: "Uploading file " + file.name }))
                 const res = await fileApi.uploadFile({
                     file: file,
                     userName: user?.userName,
@@ -80,16 +80,15 @@ export default function FilesPage() {
                         setUploadProgress(percentCompleted)
                     }
                 })
-                console.log('res',res)
+
                 if (res.succeed) {
                     setFiles([res.data, ...files])
                     success("File uploaded successfully")
                 } else {
                     error(res.message)
                 }
-            } catch (err) {
-                console.log('err',err)
-                error("Failed to upload file")
+            } catch (err: any) {
+                error(err.message)
             } finally {
                 dispatch(setLoading({ isLoading: false }))
             }
@@ -127,7 +126,8 @@ export default function FilesPage() {
                             </TooltipProvider>
                         </SelectContent>
                     </Select>
-                    <UploadButton onUpload={handleUpload} />
+                
+                <UploadButton onUpload={handleUpload} uploadProgress={uploadProgress}/>
                 </div>
             </div>
             

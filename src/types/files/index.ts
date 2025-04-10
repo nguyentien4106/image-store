@@ -14,6 +14,7 @@ export interface DeleteFileRequest{
 export interface DownloadFileRequest{
     id: string
     storageSource: number
+    onProgress?: (percentCompleted: number) => void;
 }
 
 export interface DownloadFileResponse{
