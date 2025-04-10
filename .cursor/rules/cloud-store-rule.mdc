@@ -1,0 +1,160 @@
+---
+description: 
+globs: *.tsx,*.ts,src/*
+alwaysApply: false
+---
+# CloudStore Project Rules and Guidelines
+
+## Project Structure
+- All source code should be in the `src` directory
+- Use feature-based folder structure (e.g., `auth`, `dashboard`, `files`)
+- Keep components, hooks, and utilities separate
+```
+src/
+├── components/     # Reusable UI components
+├── pages/         # Page components
+├── hooks/         # Custom React hooks
+├── lib/           # Utility functions
+├── types/         # TypeScript type definitions
+├── store/         # Redux/state management
+├── constants/     # Constants and enums
+└── assets/        # Static assets
+```
+
+## Component Guidelines
+- Use TypeScript for all components
+- Follow functional component pattern with hooks
+- Implement lazy loading for route-level components
+- Keep components focused and single-responsibility
+- Use shadcn/ui components when available
+
+### Component Example
+```tsx
+import { type FC } from 'react'
+import { Button } from '@/components/ui/button'
+
+interface ExampleProps {
+  title: string
+  onAction: () => void
+}
+
+export const Example: FC<ExampleProps> = ({ title, onAction }) => {
+  return (
+    <div>
+      <h1>{title}</h1>
+      <Button onClick={onAction}>Click Me</Button>
+    </div>
+  )
+}
+```
+
+## Performance Rules
+- Implement code splitting using React.lazy()
+- Use proper image optimization
+- Implement proper loading states
+- Use proper caching strategies
+- Minimize bundle size with proper imports
+
+## State Management
+- Use Redux for global state
+- Use local state for component-specific state
+- Implement proper loading and error states
+- Follow Redux best practices for actions and reducers
+
+## API Integration
+- Use proper error handling
+- Implement proper loading states
+- Use TypeScript interfaces for API responses
+- Follow RESTful conventions
+
+## Styling Guidelines
+- Use Tailwind CSS for styling
+- Follow mobile-first approach
+- Use proper color variables
+- Maintain consistent spacing
+- Use proper responsive design patterns
+
+## File Naming Conventions
+- Use kebab-case for file names
+- Use PascalCase for component names
+- Use camelCase for function and variable names
+- Add proper file extensions (.tsx, .ts)
+
+## Code Quality
+- Write unit tests for components
+- Maintain proper TypeScript types
+- Use ESLint and Prettier
+- Follow proper error handling
+- Write proper documentation
+
+## Import/Export Rules
+- Use absolute imports with @ alias
+- Export named components
+- Group imports by type
+- Maintain proper import order
+
+Example:
+```tsx
+// External imports
+import { useState, useEffect } from 'react'
+import { useDispatch } from 'react-redux'
+
+// Internal imports
+import { Button } from '@/components/ui/button'
+import { useAuth } from '@/hooks/use-auth'
+import { formatDate } from '@/lib/utils'
+```
+
+## Error Handling
+- Use proper error boundaries
+- Implement proper loading states
+- Show user-friendly error messages
+- Log errors properly
+
+## Security Guidelines
+- Implement proper authentication
+- Use proper authorization
+- Sanitize user inputs
+- Follow security best practices
+
+## Optimization Rules
+- Implement proper lazy loading
+- Use proper image optimization
+- Minimize bundle size
+- Use proper caching strategies
+
+## Git Workflow
+- Use proper branch naming
+- Write meaningful commit messages
+- Follow conventional commits
+- Create proper pull requests
+
+## Documentation
+- Write proper component documentation
+- Document utility functions
+- Maintain proper TypeScript types
+- Keep README up to date
+
+## Testing Guidelines
+- Write unit tests for components
+- Test error states
+- Test loading states
+- Test user interactions
+
+## Accessibility
+- Use proper ARIA labels
+- Maintain proper contrast
+- Support keyboard navigation
+- Follow WCAG guidelines
+
+## Responsive Design
+- Use proper breakpoints
+- Follow mobile-first approach
+- Test on multiple devices
+- Use proper responsive images
+
+## Build and Development
+- Use proper development tools
+- Maintain proper build configuration
+- Use proper environment variables
+- Follow deployment best practices
