@@ -12,12 +12,19 @@ export interface File {
   userId: string
   username: string
 }
+// Interface for progress tracking
+interface DownloadProgress {
+  percentage: number;
+  loaded: number;
+  total: number;
+}
 
 const apiPath = {
   uploadFile: "/files/",
   getUserFiles: "/files/users",
   deleteFile: "/files",
-  downloadFile: "/files/download"
+  downloadFile: "/files/download",
+  downloadFileLarge: "/files/download-large-file",
 }
 
 const fileApi = {
@@ -116,8 +123,33 @@ const fileApi = {
     link.remove();
 
     window.URL.revokeObjectURL(url);
-  }
+  },
 
+  downloadFileTest: async (data: DownloadFileRequest): Promise<void> => {
+    const response = await api.post(apiPath.downloadFileLarge, data, {
+      responseType: 'blob',
+      onDownloadProgress: (progressEvent: AxiosProgressEvent) => {
+        if (progressEvent.total) {
+          const progress: DownloadProgress = {
+            percentage: Math.round((progressEvent.loaded * 100) / progressEvent.total),
+            loaded: progressEvent.loaded,
+            total: progressEvent.total
+          };
+          
+          console.log(`Download Progress: ${progress.percentage}%`);
+        }
+      }
+    });
+  // Create download link from streamed blob
+  const url = window.URL.createObjectURL(new Blob([response.data]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', 'a.mov');
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(url);
+  }
 }
 
 export default fileApi
