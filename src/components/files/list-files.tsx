@@ -5,8 +5,8 @@ import { StorageSource } from "@/constants/enum"
 
 interface ListFilesProps {
   files?: FileInformation[]
-  onDelete?: (id: string, storageSource: number) => void
-  onDownload?: (id: string, storageSource: StorageSource) => void
+  onDelete?: (id: string, fileName: string, storageSource: number) => void
+  onDownload?: (id: string, fileName: string, storageSource: StorageSource) => void
   isLoading?: boolean
 }
 

@@ -22,3 +22,10 @@ export interface PaginatedResult<T> {
   count: number
   data: T[]
 }
+
+export interface Progress {
+  progress: number
+  name: string
+  id: string
+  type: "upload" | "download"
+}

@@ -25,8 +25,8 @@ import {
 
 interface FileCardProps {
   file: FileInformation;
-  onDownload?: (id: string, storageSource: StorageSource) => void;
-  onDelete?: (id: string, source: number) => void;
+  onDownload?: (id: string, fileName: string, storageSource: StorageSource) => void;
+  onDelete?: (id: string, fileName: string, storageSource: number) => void;
 }
 
 export function FileCard({ file, onDownload, onDelete }: FileCardProps) {
@@ -38,7 +38,7 @@ export function FileCard({ file, onDownload, onDelete }: FileCardProps) {
             <Button
               variant="secondary"
               size="icon"
-              onClick={() => onDownload(file.id, file.storageSource)}
+              onClick={() => onDownload(file.id, file.fileName, file.storageSource)}
               className="bg-green hover:bg-white shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer"
             >
               <Download className="h-5 w-5" />
@@ -63,8 +63,8 @@ export function FileCard({ file, onDownload, onDelete }: FileCardProps) {
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => onDelete(file.id, file.storageSource)}>
+                  <AlertDialogCancel className="cursor-pointer">Cancel</AlertDialogCancel>
+                  <AlertDialogAction className="cursor-pointer" onClick={() => onDelete(file.id, file.fileName, file.storageSource)}>
                     Delete
                   </AlertDialogAction>
                 </AlertDialogFooter>

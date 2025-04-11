@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { ListFiles } from "@/components/files/list-files"
 import { UploadButton } from "@/components/files/upload-button"
+import { UploadFolderButton } from "@/components/files/upload-folder-button"
 import { AccountLimitsPanel } from "@/components/files/account-limits-panel"
 import { useNotification } from "@/hooks/notification"
 import fileApi from "@/apis/files"
@@ -18,6 +19,8 @@ import {
   } from "@/components/ui/select"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { CrownIcon } from "lucide-react"
+import { ProgressBar } from "@/components/ui/progress-bar"
+import { Progress } from "@/types"
 
 export default function FilesPage() {
     const { success, error } = useNotification()
@@ -25,7 +28,8 @@ export default function FilesPage() {
     const [files, setFiles] = useState<FileInformation[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [storageSource, setStorageSource] = useState(user?.accountType == AccountType.Free ? StorageSource.Telegram : StorageSource.R2)
-    const [uploadProgress, setUploadProgress] = useState(0)
+    const [uploadProgresses, setUploadProgresses] = useState<Progress[]>([])
+    const [downloadProgresses, setDownloadProgresses] = useState<Progress[]>([])
     
     const dispatch = useDispatch()
 
@@ -34,15 +38,16 @@ export default function FilesPage() {
         if (user?.userName) {
             fileApi.getUserFiles(user?.userName).then((res) => {
                 setFiles(res.data.data)
+                console.log(res.data)
                 setIsLoading(false)
             })
         }
     }, [])
 
-    const handleDelete = async (id: string, source: number) => {
+    const handleDelete = async (id: string, fileName: string, source: number) => {
         if(user?.userName){
             try {
-                dispatch(setLoading({ isLoading: true, loadingText: "Deleting file", isSmall: true }))
+                dispatch(setLoading({ isLoading: true, loadingText: "Deleting " + fileName, isSmall: true }))
                 const result = await fileApi.deleteFile({
                     id: id,
                     storageSource: source
@@ -51,47 +56,92 @@ export default function FilesPage() {
                     setFiles(files.filter(file => file.id !== id))
                     success("File deleted successfully")
                 } else {
-                    console.log(result)
                     error(result.message)
                 }
-            } catch (err) {
-                error("Failed to delete file") 
+            } catch (err: any) {
+                error(err.message || "Failed to delete file") 
             } finally {
                 dispatch(setLoading({ isLoading: false, isSmall: false }))
             }
         }
     }
 
-    const handleDownload = async (id: string, storageSource: StorageSource) => {
+    const handleDownload = async (id: string, fileName: string, storageSource: StorageSource) => {
         if(user?.userName){
-            await fileApi.downloadFile({ id, storageSource })
+            try {
+                setDownloadProgresses(prev => [...prev, { id, name: fileName, progress: 0, type: "download" }])
+                
+                await fileApi.downloadFile({
+                    id: id,
+                    storageSource: storageSource,
+                    onProgress: (percentCompleted) => {
+                        setDownloadProgresses(prev => 
+                            prev.map(progress => 
+                                progress.name === fileName && progress.type === "download"
+                                    ? { ...progress, progress: percentCompleted }
+                                    : progress
+                            )
+                        )
+                    }
+                })
+
+                setDownloadProgresses(prev => prev.filter(progress => progress.id !== id))
+                success(`Download completed: ${fileName}`)
+            } catch (err: any) {
+                setDownloadProgresses(prev => prev.filter(progress => progress.id !== id))
+                error(err.message || `Failed to download ${fileName}`)
+            }
         }
     }
 
-    const handleUpload = async (file: File) => {
+    const handleUpload = async (file: File, id?: string) => {
+        console.log('uploading', id)
         if(user?.userName){
             try {
-                dispatch(setLoading({ isLoading: true, isSmall: true, loadingText: "Uploading file " + file.name }))
+                setUploadProgresses(prev => [...prev, { id: id ?? file.name, name: file.name, progress: 0, type: "upload" }])
                 const res = await fileApi.uploadFile({
                     file: file,
                     userName: user?.userName,
                     storageSource: storageSource,
                     accountType: user?.accountType,
                     onProgress: (percentCompleted) => {
-                        setUploadProgress(percentCompleted)
+                        setUploadProgresses(prev => 
+                            prev.map(progress => 
+                                progress.id === (id ?? file.name) && progress.type === "upload"
+                                    ? { ...progress, progress: percentCompleted }
+                                    : progress
+                            )
+                        )
                     }
                 })
 
                 if (res.succeed) {
                     setFiles([res.data, ...files])
+                    setUploadProgresses(prev => prev.filter(progress => progress.id !== (id ?? file.name)))
                     success("File uploaded successfully")
                 } else {
+                    setUploadProgresses(prev => prev.filter(progress => progress.id !== (id ?? file.name)))
                     error(res.message)
                 }
             } catch (err: any) {
                 error(err.message)
             } finally {
-                dispatch(setLoading({ isLoading: false }))
+                setUploadProgresses(prev => prev.filter(progress => progress.id !== (id ?? file.name)))
+            }
+        }
+    }
+
+    const handleFolderUpload = async (files: File[]) => {
+        if(user?.userName){
+            try {
+                // Upload files sequentially to avoid overwhelming the server
+                await Promise.all(
+                    files.map((file, index) => handleUpload(file, file.name + "~" + index + " - " + user?.userName))
+                );
+                success(`Successfully uploaded ${files.length} files`)
+            } catch (err: any) {
+                error(err.message || "Failed to upload some files")
+            } finally {
             }
         }
     }
@@ -129,9 +179,48 @@ export default function FilesPage() {
                                     </TooltipProvider>
                                 </SelectContent>
                             </Select>
-                            <UploadButton onUpload={handleUpload} uploadProgress={uploadProgress}/>
+                            <div className="flex gap-2">
+                                <UploadButton onUpload={handleUpload}/>
+                                <UploadFolderButton onUpload={handleFolderUpload} />
+                            </div>
                         </div>
                     </div>
+                    {(uploadProgresses.length > 0) && (
+                        <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 space-y-4">
+                            {uploadProgresses.map((progress) => (
+                                <div key={progress.id} className="bg-background p-4 rounded-lg shadow-lg">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-sm font-medium truncate max-w-[200px]">
+                                            Uploading: {progress.name}
+                                        </span>
+                                        <span className="text-sm text-muted-foreground">
+                                            {progress.progress}%
+                                        </span>
+                                    </div>
+                                    <ProgressBar progress={progress.progress} />
+                                </div>
+                            ))}
+                            
+                        </div>
+                    )}
+                    {
+                    downloadProgresses.length > 0 && (
+                        <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 space-y-4">
+                        {downloadProgresses.map((progress) => (
+                            <div key={progress.id} className="bg-background p-4 rounded-lg shadow-lg">
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="text-sm font-medium truncate max-w-[200px]">
+                                        Downloading: {progress.name}
+                                    </span>
+                                    <span className="text-sm text-muted-foreground">
+                                        {progress.progress}%
+                                    </span>
+                                </div>
+                                    <ProgressBar progress={progress.progress} />
+                                </div>
+                            ))} 
+                        </div>
+                    )}
                     <ListFiles
                         files={files}
                         onDelete={handleDelete}

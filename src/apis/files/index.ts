@@ -62,7 +62,6 @@ const fileApi = {
 
       return response.data
     } catch (error: any) {
-      console.error("Error uploading file:", error);
       return error.response.data 
     }
   },
@@ -93,14 +92,19 @@ const fileApi = {
    * @param storageSource The storage source of the file
    * @returns Promise<void> - Triggers browser download
    */
-  downloadFile: async (data: DownloadFileRequest): Promise<AppResponse<DownloadFileResponse> | undefined> => {
-    if(data.storageSource == StorageSource.R2){
-      var result = await api.post<AppResponse<DownloadFileResponse>>(apiPath.downloadFile, data);
-      return result.data;
-    }
-    
+  downloadFile: async (data: DownloadFileRequest): Promise<void> => {
     const response = await api.post(apiPath.downloadFile, data, {
       responseType: 'blob',
+      onDownloadProgress: (progressEvent: AxiosProgressEvent) => {
+        if (progressEvent.total) {
+          const progress: DownloadProgress = {
+            percentage: Math.round((progressEvent.loaded * 100) / progressEvent.total),
+            loaded: progressEvent.loaded,
+            total: progressEvent.total
+          };
+          data?.onProgress?.(progress.percentage)
+        }
+      }
     });
 
     const contentDisposition = response.headers['content-disposition'];
