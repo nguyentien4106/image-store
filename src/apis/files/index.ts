@@ -1,7 +1,6 @@
 import { api } from "@/services/api";
-import { DeleteFileRequest, DownloadFileRequest, DownloadFileResponse, FileInformation, UploadFileFormData } from "@/types/files";
+import { DeleteFileRequest, DownloadFileRequest, FileInformation, UploadFileFormData } from "@/types/files";
 import { AppResponse, PaginatedResult } from "@/types";
-import { StorageSource } from "@/constants/enum";
 import { AxiosProgressEvent } from "axios";
 
 export interface File {

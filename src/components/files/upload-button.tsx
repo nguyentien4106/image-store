@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { useState } from "react";
-import { ProgressBar } from "@/components/ui/progress-bar";
 
 interface UploadButtonProps {
   onUpload: (file: File) => void;
