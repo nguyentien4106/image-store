@@ -6,6 +6,8 @@ import ErrorPage from '@/pages/error'
 import HomePage from '@/pages/home'
 import { ProtectedLayout } from '@/layouts/protected-layout'
 import AuthLayout from '@/layouts/auth-layout'
+import { paymentRoutes } from './payment'
+import PricingPage from '@/pages/pricing'
 
 export const router = createBrowserRouter([
   {
@@ -23,6 +25,17 @@ export const router = createBrowserRouter([
     path: '/',
     element: <ProtectedLayout />,
     children: [...dashboardRoutes, ...fileRoutes],
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/',
+    element: <ProtectedLayout />,
+    children: [...paymentRoutes],
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/pricing',
+    element: <PricingPage />,
     errorElement: <ErrorPage />,
   },
 ])

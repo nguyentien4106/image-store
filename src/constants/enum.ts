@@ -20,3 +20,8 @@ export enum AccountType {
     Pro = "Pro",
     Plus = "Plus",
 }
+
+export enum OrderType {
+    Pro = "UPGRADE_PRO",
+    Plus = "UPGRADE_PLUS",
+}

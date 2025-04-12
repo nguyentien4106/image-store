@@ -1,3 +1,5 @@
+import { AccountType } from "@/constants/enum"
+
 export interface AppResponse<T> {
   succeed: boolean
   message: string
@@ -28,4 +30,16 @@ export interface Progress {
   name: string
   id: string
   type: "upload" | "download"
+}
+
+export interface Plan {
+  type: AccountType
+  name: string
+  price: number
+  description: string
+  features: {
+      title: string
+      items: string[]
+      icon: React.ReactNode
+  }[]
 }

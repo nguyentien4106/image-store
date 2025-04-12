@@ -16,7 +16,7 @@ import { useAppDispatch } from "@/store/hooks"
 import { startLoading, stopLoading } from "@/store/slices/loadingSlice"
 import { useNotification } from "@/hooks/notification"
 import { LoginRequest } from "@/types/auth"
-import { FILES_PATH } from "@/constants/path"
+import { DASHBOARD_PATH, FILES_PATH } from "@/constants/path"
 import { setUser } from "@/store/slices/userSlice"
 export function LoginForm({
   className,
@@ -40,7 +40,7 @@ export function LoginForm({
         error(result.message)
       } else {
         dispatch(setUser(authApi.getCurrentUser()))
-        navigate(FILES_PATH.files)
+        navigate(DASHBOARD_PATH.dashboard)
       }
     } catch (err) {
       error('Invalid email or password')
