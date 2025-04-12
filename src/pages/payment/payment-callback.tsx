@@ -9,7 +9,7 @@ import { useNavigate, useSearchParams } from "react-router-dom"
 
 const PaymentCallback: React.FC = () => {
     const navigate = useNavigate()
-    const [searchParams, setSearchParams] = useSearchParams()
+    const [searchParams] = useSearchParams()
     const { success, error } = useNotification()
     const [isLoading, setIsLoading] = useState<boolean>(true)
     const [paymentStatus, setPaymentStatus] = useState<'success' | 'error' | null>(null)

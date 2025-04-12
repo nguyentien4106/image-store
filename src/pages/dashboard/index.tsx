@@ -2,14 +2,13 @@ import { useEffect, useState } from "react"
 import { StorageStats } from "@/components/dashboard/storage-stats"
 import { PlanInfoCard } from "@/components/dashboard/plan-info"
 import { dashboardApi } from "@/apis/dashboard"
-import { RootState } from "@/store"
-import { useSelector } from "react-redux"
+import { useAppSelector } from "@/store/hooks"
 import { DashboardData } from "@/types/dashboard"
 import { useNotification } from "@/hooks/notification"
 
 export default function DashboardPage() {
-    const { success, error } = useNotification()
-    const { user } = useSelector((state: RootState) => state.user)
+    const { error } = useNotification()
+    const { user } = useAppSelector(state => state.user)
     const [storageData, setStorageData] = useState<DashboardData | null>(null)
     const [isLoading, setIsLoading] = useState(true)
 

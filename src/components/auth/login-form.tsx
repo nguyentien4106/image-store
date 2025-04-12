@@ -16,7 +16,7 @@ import { useAppDispatch } from "@/store/hooks"
 import { startLoading, stopLoading } from "@/store/slices/loadingSlice"
 import { useNotification } from "@/hooks/notification"
 import { LoginRequest } from "@/types/auth"
-import { DASHBOARD_PATH, FILES_PATH } from "@/constants/path"
+import { DASHBOARD_PATH } from "@/constants/path"
 import { setUser } from "@/store/slices/userSlice"
 export function LoginForm({
   className,

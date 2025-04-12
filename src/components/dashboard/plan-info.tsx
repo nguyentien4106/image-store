@@ -1,5 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { PlanInfo } from "@/types/dashboard"
 import { formatBytes } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { CrownIcon } from "lucide-react"
