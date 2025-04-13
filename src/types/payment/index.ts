@@ -1,10 +1,11 @@
-import { OrderType } from "@/constants/enum"
+import { OrderType, SubscriptionType } from "@/constants/enum"
 
 export interface CreatePaymentRequest {
     amount: number
     orderInfo: string
     orderType: OrderType
     userId: string
+    subscriptionType: SubscriptionType
 }
 
 export interface VNPayPaymentResponse {

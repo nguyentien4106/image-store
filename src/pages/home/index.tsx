@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Check, Cloud, Database, FileText, Lock, Shield, Upload } from "lucide-react"
 import { scrollToSection } from "@/lib/utils"
-import { AUTH_PATH } from "@/constants/path"
+import { AUTH_PATH, DASHBOARD_PATH } from "@/constants/path"
 import image from "@/assets/cloud-storage.png"
 import { getCompanyIcon } from "@/lib/icons"
+import { useAppSelector } from "@/store/hooks"
 // Define TypeScript interfaces for component props
 interface FeatureCardProps {
   icon: React.ReactNode
@@ -37,7 +38,7 @@ export default function LandingPage(): React.ReactElement {
     scrollToSection(sectionId)
   }
   const navigate = useNavigate()
-
+  const user = useAppSelector((state) => state.user)
   return (
     <div className="flex min-h-screen flex-col items-center">
       <header className="sticky top-0 z-40 w-full border-b bg-background">
@@ -69,12 +70,20 @@ export default function LandingPage(): React.ReactElement {
               Pricing
             </Link>
           </nav>
-          <div className="flex items-center gap-4">
-            <Button variant="outline" size="sm" className="cursor-pointer" onClick={() => navigate(AUTH_PATH.login)}>
-              Log in
-            </Button>
-            <Button size="sm" className="cursor-pointer" onClick={() => navigate(AUTH_PATH.signup)}>Sign up</Button>
-          </div>
+          {
+            user ? (
+              <Button variant="outline" size="sm" className="cursor-pointer" onClick={() => navigate(DASHBOARD_PATH.dashboard)}>
+                Dashboard
+              </Button>
+            ) : (
+              <div className="flex items-center gap-4">
+                <Button variant="outline" size="sm" className="cursor-pointer" onClick={() => navigate(AUTH_PATH.login)}>
+                  Log in
+                </Button>
+                <Button size="sm" className="cursor-pointer" onClick={() => navigate(AUTH_PATH.signup)}>Sign up</Button>
+              </div>
+            )
+          }
         </div>
       </header>
 

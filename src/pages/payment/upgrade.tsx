@@ -21,28 +21,6 @@ const UpgradePage: React.FC = () => {
     const handlePayment = async (): Promise<void> => {
         if (!selectedPlan || !user?.userName) return
 
-        try {
-            setIsProcessing(true)
-            const plan = PLANS.find(p => p.type === selectedPlan)
-            if (!plan) throw new Error("Invalid plan selected")
-
-            const response = await paymentApi.createPayment({
-                amount: plan.price,
-                orderInfo: `Upgrade to ${plan.name}`,
-                orderType: plan.type === AccountType.Pro ? OrderType.Pro : OrderType.Plus,
-                userId: user.userId
-            })
-
-            if (response.succeed) {
-                window.open(response.data, '_blank')
-            } else {
-                error(response.message)
-            }
-        } catch (err: any) {
-            error(err.message)
-        } finally {
-            setIsProcessing(false)
-        }
     }
 
     return (

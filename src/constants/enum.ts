@@ -25,3 +25,8 @@ export enum OrderType {
     Pro = "UPGRADE_PRO",
     Plus = "UPGRADE_PLUS",
 }
+
+export enum SubscriptionType {
+    Monthly = "Monthly",
+    Yearly = "Yearly",
+}

@@ -1,5 +1,5 @@
 import type { AuthToken, LoginRequest, SignUpRequest, User } from "@/types/auth";
-import { api } from "@/services/api";
+import { api } from "@/config/api";
 import Cookies from "js-cookie";
 import { AppResponse } from "@/types";
 

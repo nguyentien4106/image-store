@@ -5,6 +5,7 @@ import { dashboardApi } from "@/apis/dashboard"
 import { useAppSelector } from "@/store/hooks"
 import { DashboardData } from "@/types/dashboard"
 import { useNotification } from "@/hooks/notification"
+import { AccountLimitsPanel } from "@/components/files/account-limits-panel"
 
 export default function DashboardPage() {
     const { error } = useNotification()
@@ -55,6 +56,9 @@ export default function DashboardPage() {
                         )}
                     </div>
                 </div>
+            </div>
+            <div className="md:col-span-1">
+              {user && <AccountLimitsPanel accountType={user.accountType} />}
             </div>
         </div>
     )

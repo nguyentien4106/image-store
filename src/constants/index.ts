@@ -1,9 +1,9 @@
-import { FILES_PATH } from "./path";
-import { FileText } from "lucide-react";
+import { FILES_PATH, PAYMENT_PATH } from "./path";
+import { CreditCard, FileText } from "lucide-react";
 import { SidebarItem } from "@/types";
 import { DASHBOARD_PATH } from "./path";
 import { LayoutDashboard } from "lucide-react";
-
+import { PRICING_PATH } from "./path";
 export const sidebarItems: SidebarItem[] = [
     {
       title: "Dashboard",
@@ -14,5 +14,15 @@ export const sidebarItems: SidebarItem[] = [
       title: "Storage",
       href: FILES_PATH.files,
       icon: FileText,
+    },
+    {
+      title: "Pricing",
+      href: PRICING_PATH.pricing,
+      icon: CreditCard,
+    },
+    {
+      title: "Payment",
+      href: PAYMENT_PATH.payment,
+      icon: CreditCard,
     },
   ]

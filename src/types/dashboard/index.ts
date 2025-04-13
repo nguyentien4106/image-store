@@ -33,3 +33,12 @@ export interface DashboardResponse {
     message: string
     data: DashboardData
 } 
+
+export interface UserSubscription {
+    accountType: AccountType
+    isActive: boolean
+    startDate: string
+    endDate: string
+    isExpired: boolean
+    remainingTime: string
+}

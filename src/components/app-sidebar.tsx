@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router-dom"
 import { cn } from "@/lib/utils"
 import { sidebarItems } from "@/constants"
+import { getCompanyIcon } from "@/lib/icons"
 
 
 export function AppSidebar() {
@@ -9,7 +10,8 @@ export function AppSidebar() {
   return (
     <div className="flex h-full w-64 flex-col border-r bg-background">
       <div className="flex h-14 items-center border-b px-4">
-        <h1 className="text-lg font-semibold">CloudStore</h1>
+        {/* <h1 className="text-lg font-semibold">CloudStore</h1> */}
+        {getCompanyIcon()}
       </div>
       <div className="flex-1 overflow-auto py-2">
         <div className="flex flex-col gap-1 px-2">

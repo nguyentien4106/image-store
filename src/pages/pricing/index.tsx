@@ -1,13 +1,15 @@
-import React from "react"
+import React, { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Check } from "lucide-react"
-import { AccountType } from "@/constants/enum"
-import { useNavigate } from "react-router-dom"
+import { Check, Calendar } from "lucide-react"
+import { AccountType, SubscriptionType } from "@/constants/enum"
+import { createSearchParams, useNavigate } from "react-router-dom"
+
 interface Plan {
     type: AccountType
     name: string
-    price: number
+    monthlyPrice: number
+    yearlyPrice: number
     description: string
     features: string[]
     popular?: boolean
@@ -17,7 +19,8 @@ const PLANS: Plan[] = [
     {
         type: AccountType.Free,
         name: "Free Plan",
-        price: 0,
+        monthlyPrice: 0,
+        yearlyPrice: 0,
         description: "Perfect for getting started with basic storage needs",
         features: [
             "1GB Storage",
@@ -29,7 +32,8 @@ const PLANS: Plan[] = [
     {
         type: AccountType.Pro,
         name: "Premium Plan",
-        price: 100000,
+        monthlyPrice: 100000,
+        yearlyPrice: 1080000, // 10% discount
         description: "Ideal for professionals and small businesses",
         features: [
             "10GB Storage",
@@ -44,7 +48,8 @@ const PLANS: Plan[] = [
     {
         type: AccountType.Plus,
         name: "Plus Plan",
-        price: 200000,
+        monthlyPrice: 200000,
+        yearlyPrice: 2160000, // 10% discount
         description: "For large organizations with advanced needs",
         features: [
             "50GB Storage",
@@ -61,6 +66,7 @@ const PLANS: Plan[] = [
 
 const PricingPage: React.FC = () => {
     const navigate = useNavigate()
+    const [billingCycle, setBillingCycle] = useState<SubscriptionType>(SubscriptionType.Monthly)
 
     return (
         <div className="flex flex-1 flex-col">
@@ -69,16 +75,35 @@ const PricingPage: React.FC = () => {
                     <div className="px-4 lg:px-6">
                         <div className="text-center mb-12">
                             <h1 className="text-4xl font-bold tracking-tight mb-4">Simple, Transparent Pricing</h1>
-                            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+                            <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-8">
                                 Choose the perfect plan for your needs. All plans include a 14-day free trial.
                             </p>
+                            <div className="flex items-center justify-center gap-4">
+                                <Button
+                                    variant={billingCycle === SubscriptionType.Monthly ? 'default' : 'outline'}
+                                    onClick={() => setBillingCycle(SubscriptionType.Monthly)}
+                                >
+                                    Monthly
+                                </Button>
+                                <Button
+                                    variant={billingCycle === SubscriptionType.Yearly ? 'default' : 'outline'}
+                                    onClick={() => setBillingCycle(SubscriptionType.Yearly)}
+                                >
+                                    Yearly
+                                    {billingCycle === SubscriptionType.Yearly && (
+                                        <span className="ml-2 px-2 py-0.5 text-xs bg-green-100 text-green-800 rounded-full">
+                                            Save 10%
+                                        </span>
+                                    )}
+                                </Button>
+                            </div>
                         </div>
 
                         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                             {PLANS.map((plan) => (
                                 <Card
                                     key={plan.type}
-                                    className={`relative ${
+                                    className={`relative flex flex-col ${
                                         plan.popular
                                             ? "border-primary shadow-lg"
                                             : "border-border"
@@ -93,17 +118,26 @@ const PricingPage: React.FC = () => {
                                         <CardTitle>{plan.name}</CardTitle>
                                         <CardDescription>{plan.description}</CardDescription>
                                         <div className="mt-4">
-                                            <span className="text-4xl font-bold">
-                                                {plan.price === 0
-                                                    ? "Free"
-                                                    : `${plan.price.toLocaleString('vi-VN')} VND`}
-                                            </span>
-                                            {plan.price > 0 && (
-                                                <span className="text-muted-foreground">/month</span>
+                                            <div className="flex items-baseline gap-2">
+                                                <span className="text-4xl font-bold">
+                                                    {plan.monthlyPrice === 0
+                                                        ? "Free"
+                                                        : billingCycle === SubscriptionType.Monthly
+                                                            ? `${plan.monthlyPrice.toLocaleString('vi-VN')} VND`
+                                                            : `${plan.yearlyPrice.toLocaleString('vi-VN')} VND`}
+                                                </span>
+                                                <span className="text-muted-foreground">
+                                                    /{billingCycle === SubscriptionType.Monthly ? 'month' : 'year'}
+                                                </span>
+                                            </div>
+                                            {billingCycle === SubscriptionType.Yearly && plan.monthlyPrice > 0 && (
+                                                <div className="text-sm text-muted-foreground mt-1">
+                                                    {Math.round(plan.yearlyPrice / 12).toLocaleString('vi-VN')} VND/month
+                                                </div>
                                             )}
                                         </div>
                                     </CardHeader>
-                                    <CardContent>
+                                    <CardContent className="flex-1">
                                         <ul className="space-y-4">
                                             {plan.features.map((feature, index) => (
                                                 <li key={index} className="flex items-center gap-2">
@@ -117,9 +151,15 @@ const PricingPage: React.FC = () => {
                                         <Button
                                             className="w-full"
                                             variant={plan.popular ? "default" : "outline"}
-                                            onClick={() => navigate(`/payment?plan=${plan.type}`)}
+                                            onClick={() => navigate({
+                                                pathname: '/payment',
+                                                search: createSearchParams({
+                                                    plan: plan.type,
+                                                    billing: billingCycle.toString()
+                                                }).toString()
+                                            })}
                                         >
-                                            {plan.price === 0 ? "Get Started" : "Choose Plan"}
+                                            {plan.monthlyPrice === 0 ? "Get Started" : "Choose Plan"}
                                         </Button>
                                     </CardFooter>
                                 </Card>

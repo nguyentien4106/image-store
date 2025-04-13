@@ -1,4 +1,4 @@
-import { api } from "@/services/api";
+import { api } from "@/config/api";
 import { DeleteFileRequest, DownloadFileRequest, FileInformation, UploadFileFormData } from "@/types/files";
 import { AppResponse, PaginatedResult } from "@/types";
 import { AxiosProgressEvent } from "axios";

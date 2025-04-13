@@ -14,3 +14,11 @@ export const HOME_PATH = {
 export const DASHBOARD_PATH = {
     dashboard: "/dashboard"
 }
+
+export const PRICING_PATH = {
+    pricing: "/pricing"
+}
+
+export const PAYMENT_PATH = {
+    payment: "/payment"
+}

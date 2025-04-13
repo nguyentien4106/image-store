@@ -1,6 +1,6 @@
 import axios from "axios"
 import { CreatePaymentRequest, VNPayPaymentResult } from "@/types/payment"
-import { api } from "@/services/api"
+import { api } from "@/config/api"
 import { AppResponse } from "@/types"
 
 export const paymentApi = {

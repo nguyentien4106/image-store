@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react"
 import { ListFiles } from "@/components/files/list-files"
-import { UploadButton } from "@/components/files/upload-button"
-import { UploadFolderButton } from "@/components/files/upload-folder-button"
 import { AccountLimitsPanel } from "@/components/files/account-limits-panel"
 import { useNotification } from "@/hooks/notification"
 import fileApi from "@/apis/files"
@@ -16,11 +14,12 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
-  } from "@/components/ui/select"
+} from "@/components/ui/select"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { CrownIcon } from "lucide-react"
 import { ProgressBar } from "@/components/ui/progress-bar"
 import { Progress } from "@/types"
+import { FileSelector } from "@/components/files/file-selector"
 
 export default function FilesPage() {
     const { success, error } = useNotification()
@@ -34,11 +33,9 @@ export default function FilesPage() {
     const dispatch = useDispatch()
 
     useEffect(() => {
-        console.log(user)
         if (user?.userName) {
             fileApi.getUserFiles(user?.userName).then((res) => {
                 setFiles(res.data.data)
-                console.log(res.data)
                 setIsLoading(false)
             })
         }
@@ -94,11 +91,10 @@ export default function FilesPage() {
         }
     }
 
-    const handleUpload = async (file: File, id?: string) => {
-        console.log('uploading', id)
+    const handleUpload = async (file: File) => {
         if(user?.userName){
             try {
-                setUploadProgresses(prev => [...prev, { id: id ?? file.name, name: file.name, progress: 0, type: "upload" }])
+                setUploadProgresses(prev => [...prev, { id: file.name, name: file.name, progress: 0, type: "upload" }])
                 const res = await fileApi.uploadFile({
                     file: file,
                     userName: user?.userName,
@@ -107,7 +103,7 @@ export default function FilesPage() {
                     onProgress: (percentCompleted) => {
                         setUploadProgresses(prev => 
                             prev.map(progress => 
-                                progress.id === (id ?? file.name) && progress.type === "upload"
+                                progress.id === file.name && progress.type === "upload"
                                     ? { ...progress, progress: percentCompleted }
                                     : progress
                             )
@@ -117,16 +113,16 @@ export default function FilesPage() {
 
                 if (res.succeed) {
                     setFiles([res.data, ...files])
-                    setUploadProgresses(prev => prev.filter(progress => progress.id !== (id ?? file.name)))
+                    setUploadProgresses(prev => prev.filter(progress => progress.id !== file.name))
                     success("File uploaded successfully")
                 } else {
-                    setUploadProgresses(prev => prev.filter(progress => progress.id !== (id ?? file.name)))
+                    setUploadProgresses(prev => prev.filter(progress => progress.id !== file.name))
                     error(res.message)
                 }
             } catch (err: any) {
                 error(err.message)
             } finally {
-                setUploadProgresses(prev => prev.filter(progress => progress.id !== (id ?? file.name)))
+                setUploadProgresses(prev => prev.filter(progress => progress.id !== file.name))
             }
         }
     }
@@ -134,14 +130,12 @@ export default function FilesPage() {
     const handleFolderUpload = async (files: File[]) => {
         if(user?.userName){
             try {
-                // Upload files sequentially to avoid overwhelming the server
                 await Promise.all(
-                    files.map((file, index) => handleUpload(file, file.name + "~" + index + " - " + user?.userName))
+                    files.map((file, index) => handleUpload(file))
                 );
                 success(`Successfully uploaded ${files.length} files`)
             } catch (err: any) {
                 error(err.message || "Failed to upload some files")
-            } finally {
             }
         }
     }
@@ -151,13 +145,16 @@ export default function FilesPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="md:col-span-2 space-y-6">
                     <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-4">
-                            <Select defaultValue={storageSource.toString()} onValueChange={(value) => setStorageSource(Number(value))}>
+                        <div className="flex items-center gap-4" style={{ width: "100px" }}>
+                            <Select 
+                                defaultValue={storageSource.toString()} 
+                                onValueChange={(value) => setStorageSource(Number(value))}
+                            >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select storage" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value={StorageSource.Telegram.toString()}>Telegram</SelectItem>
+                                    <SelectItem value={StorageSource.Telegram.toString()}>Not Secured</SelectItem>
                                     <TooltipProvider>
                                         <Tooltip>
                                             <TooltipTrigger asChild>
@@ -166,7 +163,7 @@ export default function FilesPage() {
                                                         disabled={user?.accountType == AccountType.Free} 
                                                         value={StorageSource.R2.toString()}
                                                     >
-                                                    Cloudflare R2 <CrownIcon className="w-4 h-4" color="#FFD700" size={20}/>
+                                                    R2 <CrownIcon className="w-4 h-4" color="#FFD700" size={20}/>
                                                     </SelectItem>
                                                 </div>
                                             </TooltipTrigger>
@@ -179,10 +176,11 @@ export default function FilesPage() {
                                     </TooltipProvider>
                                 </SelectContent>
                             </Select>
-                            <div className="flex gap-2">
-                                <UploadButton onUpload={handleUpload}/>
-                                <UploadFolderButton onUpload={handleFolderUpload} />
-                            </div>
+                            <FileSelector
+                                onUpload={handleUpload}
+                                onFolderUpload={handleFolderUpload}
+                                uploadProgresses={uploadProgresses}
+                            />
                         </div>
                     </div>
                     {(uploadProgresses.length > 0) && (
@@ -200,7 +198,6 @@ export default function FilesPage() {
                                     <ProgressBar progress={progress.progress} />
                                 </div>
                             ))}
-                            
                         </div>
                     )}
                     {
