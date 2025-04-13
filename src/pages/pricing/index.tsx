@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Check, Calendar } from "lucide-react"
+import { Check } from "lucide-react"
 import { AccountType, SubscriptionType } from "@/constants/enum"
 import { createSearchParams, useNavigate } from "react-router-dom"
 

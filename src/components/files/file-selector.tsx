@@ -9,6 +9,12 @@ interface FileSelectorProps {
     uploadProgresses: Progress[]
 }
 
+declare module "react" {
+    interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
+        webkitdirectory?: string;
+    }
+}
+
 export const FileSelector: React.FC<FileSelectorProps> = ({
     onUpload,
     onFolderUpload,
@@ -65,7 +71,6 @@ export const FileSelector: React.FC<FileSelectorProps> = ({
                     onChange={handleFolderChange}
                     className="hidden"
                     webkitdirectory=""
-                    directory=""
                     multiple
                 />
                 <Button
@@ -88,11 +93,6 @@ export const FileSelector: React.FC<FileSelectorProps> = ({
 
             {(selectedFile || selectedFiles.length > 0) && (
                 <div className="space-y-2">
-                    <div className="text-sm text-muted-foreground">
-                        {selectedFile
-                            ? `Selected file: ${selectedFile.name}`
-                            : `Selected ${selectedFiles.length} files from folder`}
-                    </div>
                     <Button
                         onClick={handleUpload}
                         disabled={uploadProgresses.length > 0}
@@ -100,6 +100,11 @@ export const FileSelector: React.FC<FileSelectorProps> = ({
                     >
                         {uploadProgresses.length > 0 ? "Uploading..." : "Upload"}
                     </Button>
+                    <div className="text-sm text-muted-foreground">
+                        {selectedFile
+                            ? `Selected file: ${selectedFile.name}`
+                            : `Selected ${selectedFiles.length} files from folder`}
+                    </div>
                 </div>
             )}
         </div>

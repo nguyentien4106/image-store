@@ -131,7 +131,7 @@ export default function FilesPage() {
         if(user?.userName){
             try {
                 await Promise.all(
-                    files.map((file, index) => handleUpload(file))
+                    files.map((file) => handleUpload(file))
                 );
                 success(`Successfully uploaded ${files.length} files`)
             } catch (err: any) {

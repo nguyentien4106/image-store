@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { formatBytes } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { CrownIcon, Clock, ChevronDown, ChevronUp } from "lucide-react"
 import { useAppSelector } from "@/store/hooks"
