@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/dialog";
 import { PreviewContent } from "./preview-content";
 import { Progress } from "@/components/ui/progress";
+import { Link } from "react-router-dom";
 
 interface FileCardProps {
   file: FileInformation;
@@ -38,9 +39,8 @@ interface FileCardProps {
 }
 
 const isPreviewable = (file: FileInformation) => {
-  const isR2Storage = file.storageSource === StorageSource.R2;
   const isMediaFile = file.contentType.startsWith('image/') || file.contentType.startsWith('video/');
-  return isR2Storage && isMediaFile;
+  return isMediaFile;
 };
 
 export function FileCard({ file, onDownload, onDelete, downloadProgress }: FileCardProps) {
@@ -59,7 +59,16 @@ export function FileCard({ file, onDownload, onDelete, downloadProgress }: FileC
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-4xl">
-                <PreviewContent file={file} />
+                {
+                  file.storageSource === StorageSource.Telegram ? (
+                    <div className="flex flex-col items-center justify-center h-full">
+                      <p className="text-sm text-gray-500">Preview Content is only support by R2 Storage. </p>
+                      <p className="text-sm text-gray-500">Please <Link to="/pricing" className="text-blue-500">upgrade</Link> your account to R2 Storage to preview content. </p>
+                    </div>
+                  ) : (
+                    <PreviewContent file={file} />
+                  )
+                }
               </DialogContent>
             </Dialog>
           )}
