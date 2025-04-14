@@ -11,8 +11,17 @@ alwaysApply: false
 - Keep components, hooks, and utilities separate
 ```
 src/
+├── apis/     # Reusable UI components
+├──── {page}/     # wrap all api method of page
 ├── components/     # Reusable UI components
+├──── ui/     # Reusable UI components for the whole app
+├──── {page}/     # Reusable UI components specific for page
+├── config/         # Configuration for the app
+├── context/         # define app context
+├── helpers/         # helper function, it can be a function to render components
+├── layouts/         # App layouts
 ├── pages/         # Page components
+├── router/         # define router for page
 ├── hooks/         # Custom React hooks
 ├── lib/           # Utility functions
 ├── types/         # TypeScript type definitions
