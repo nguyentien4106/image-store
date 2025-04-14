@@ -34,3 +34,14 @@ export interface FileInformation{
     createdAt: string
 }
 
+export interface PreviewFileResponse{
+    fileId: string
+    url: string
+    expiresAt: Date
+}
+
+export interface GetFilesByUserNameRequest{
+    pageIndex: number
+    pageSize: number
+    storageSource: number
+}

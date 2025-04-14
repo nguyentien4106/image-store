@@ -6,12 +6,12 @@ export const PLANS: Plan[] = [
     {
         type: AccountType.Pro,
         name: "Pro Plan",
-        price: 100000,
+        price: 50000,
         description: "Ideal for professionals and small businesses",
         features: [
             {
                 title: "Storage & Performance",
-                items: ["10GB Storage", "Cloudflare R2 Support", "Faster Upload Speed"],
+                items: ["150GB Storage", "Cloudflare R2 Support", "Faster Download Speed"],
                 icon: <Zap className="h-5 w-5" />
             },
             {
@@ -24,12 +24,12 @@ export const PLANS: Plan[] = [
     {
         type: AccountType.Plus,
         name: "Plus Plan",
-        price: 200000,
+        price: 150,
         description: "For large organizations with advanced needs",
         features: [
             {
                 title: "Storage & Performance",
-                items: ["50GB Storage", "Cloudflare R2 Support", "Maximum Upload Speed"],
+                items: ["50GB Storage", "Cloudflare R2 Support", "Maximum Download Speed"],
                 icon: <Zap className="h-5 w-5" />
             },
             {

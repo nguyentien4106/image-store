@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Check, Calendar } from "lucide-react"
+import { Check, Calendar, ArrowLeft } from "lucide-react"
 import { AccountType, OrderType } from "@/constants/enum"
 import { paymentApi } from "@/apis/payment"
 import { useNotification } from "@/hooks/notification"
@@ -129,6 +129,10 @@ const PaymentPage: React.FC = () => {
         }
     }
 
+    const handleBackToPricing = () => {
+        navigate('/pricing')
+    }
+
     if (!selectedPlan) {
         return null
     }
@@ -138,6 +142,16 @@ const PaymentPage: React.FC = () => {
             <div className="@container/main flex flex-1 flex-col gap-2">
                 <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
                     <div className="px-4 lg:px-6">
+                        <div className="max-w-2xl mx-auto">
+                            <Button
+                                variant="ghost"
+                                className="mb-6 -ml-2 text-muted-foreground hover:text-foreground"
+                                onClick={handleBackToPricing}
+                            >
+                                <ArrowLeft className="mr-2 h-4 w-4" />
+                                Back to Pricing
+                            </Button>
+                        </div>
                         <div className="text-center mb-12">
                             <h1 className="text-4xl font-bold tracking-tight mb-4">Complete Your Purchase</h1>
                             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">

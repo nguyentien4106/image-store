@@ -1,5 +1,5 @@
 import { api } from "@/config/api";
-import { DeleteFileRequest, DownloadFileRequest, FileInformation, UploadFileFormData } from "@/types/files";
+import { DeleteFileRequest, DownloadFileRequest, FileInformation, UploadFileFormData, PreviewFileResponse, GetFilesByUserNameRequest } from "@/types/files";
 import { AppResponse, PaginatedResult } from "@/types";
 import { AxiosProgressEvent } from "axios";
 
@@ -24,6 +24,7 @@ const apiPath = {
   deleteFile: "/files",
   downloadFile: "/files/download",
   downloadFileLarge: "/files/download-large-file",
+  getPreviewFile: "/files/preview/"
 }
 
 const fileApi = {
@@ -70,8 +71,13 @@ const fileApi = {
    * @param username The username to get files for
    * @returns Promise with array of files
    */
-  getUserFiles: async (username: string): Promise<AppResponse<PaginatedResult<FileInformation>>> => {
-    const response = await api.get<AppResponse<PaginatedResult<FileInformation>>>(`${apiPath.getUserFiles}/${username}?pageIndex=${0}&pageSize=${20}`)
+  getUserFiles: async (username: string, queryParams: GetFilesByUserNameRequest): Promise<AppResponse<PaginatedResult<FileInformation>>> => {
+    const response = await api.get<AppResponse<PaginatedResult<FileInformation>>>(
+      `${apiPath.getUserFiles}/${username}`,
+      {
+        params: queryParams
+      }
+    )
     return response.data
   },
 
@@ -143,16 +149,22 @@ const fileApi = {
         }
       }
     });
-  // Create download link from streamed blob
-  const url = window.URL.createObjectURL(new Blob([response.data]));
-  const link = document.createElement('a');
-  link.href = url;
-  link.setAttribute('download', 'a.mov');
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  window.URL.revokeObjectURL(url);
+    // Create download link from streamed blob
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'a.mov');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  },
+
+  getPreviewFile: async (fileId: string): Promise<AppResponse<PreviewFileResponse>> => {
+    const response = await api.get(`/files/${fileId}/preview`)
+    return response.data
   }
+
 }
 
 export default fileApi
