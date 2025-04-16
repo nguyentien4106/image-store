@@ -1,6 +1,5 @@
 import { Login, SignUp } from '@/pages/auth'
 import { AUTH_PATH } from '@/constants/path'
-
 export const authRoutes = [
   {
     path: AUTH_PATH.login,

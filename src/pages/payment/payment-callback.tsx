@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { CheckCircle2, XCircle } from "lucide-react"
 import { useNavigate, useSearchParams } from "react-router-dom"
-
+import { authApi } from "@/apis/auth"
 const PaymentCallback: React.FC = () => {
     const navigate = useNavigate()
     const [searchParams] = useSearchParams()
@@ -16,6 +16,7 @@ const PaymentCallback: React.FC = () => {
     const [message, setMessage] = useState<string>('')
 
     useEffect(() => {
+        console.log('call payment callback')
         const paymentData: VNPayPaymentResult = {
             vnp_Amount: searchParams.get('vnp_Amount') || '',
             vnp_BankCode: searchParams.get('vnp_BankCode') || '',
@@ -36,6 +37,7 @@ const PaymentCallback: React.FC = () => {
                 const response = await paymentApi.callbackPayment(paymentData)
                 
                 if (response.succeed) {
+                    await authApi.refreshAccessToken()
                     setPaymentStatus('success')
                     setMessage('Payment successful! Your account has been upgraded.')
                     success('Payment successful!')
@@ -54,7 +56,7 @@ const PaymentCallback: React.FC = () => {
         }
 
         verifyPayment()
-    }, [searchParams, success, error])
+    }, [searchParams])
 
     return (
         <div className="flex flex-1 flex-col">

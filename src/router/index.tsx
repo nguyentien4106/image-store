@@ -8,6 +8,7 @@ import { ProtectedLayout } from '@/layouts/protected-layout'
 import AuthLayout from '@/layouts/auth-layout'
 import { paymentRoutes } from './payment'
 import PricingPage from '@/pages/pricing'
+import AccountPage from '@/pages/account'
 
 export const router = createBrowserRouter([
   {
@@ -36,6 +37,11 @@ export const router = createBrowserRouter([
   {
     path: '/pricing',
     element: <PricingPage />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/account',
+    element: <AccountPage />,
     errorElement: <ErrorPage />,
   },
 ])

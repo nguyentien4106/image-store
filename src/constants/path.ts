@@ -1,6 +1,8 @@
 export const AUTH_PATH = {
     login: '/login',
     signup: '/signup',
+    changePassword: '/account/change-password',
+    
 }
 
 export const FILES_PATH = {

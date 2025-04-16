@@ -2,11 +2,12 @@ import type { AuthToken, LoginRequest, SignUpRequest, User } from "@/types/auth"
 import { api } from "@/config/api";
 import Cookies from "js-cookie";
 import { AppResponse } from "@/types";
+import { jwtDecode } from "jwt-decode";
+const ACCESS_TOKEN_NAME = "estore-accessToken";
+const REFRESH_TOKEN_NAME = "estore-refreshToken";
 
-const ACCESS_TOKEN_NAME = "accessToken";
-const REFRESH_TOKEN_NAME = "refreshToken";
-const twentyMinutes = 1/72;
 const sevenDays = 7;
+const oneDay = 60 * 60 * 24;
 
 const apiPath = {
   login: "/auth/login",
@@ -14,13 +15,24 @@ const apiPath = {
   refreshToken: "/auth/refresh-token",
 }
 
+const setToken = (data: AuthToken) => {
+  const user = jwtDecode<User>(data.accessToken);
+  const seconds = user.exp - Date.now() / 1000;
+  Cookies.set(ACCESS_TOKEN_NAME, data.accessToken, { expires: seconds / oneDay }); // 20 minutes
+  Cookies.set(REFRESH_TOKEN_NAME, data.refreshToken, { expires: sevenDays });
+}
+
+const removeToken = () => {
+  Cookies.remove(ACCESS_TOKEN_NAME);
+  Cookies.remove(REFRESH_TOKEN_NAME);
+}
+
 export const authApi = {
   async login(request: LoginRequest): Promise<AppResponse<AuthToken>> {
     const { data } = await api.post(apiPath.login, request);
 
     if(data.succeed){
-      Cookies.set(ACCESS_TOKEN_NAME, data.data.accessToken, { expires: twentyMinutes }); // 20 minutes
-      Cookies.set(REFRESH_TOKEN_NAME, data.data.refreshToken, { expires: sevenDays });
+      setToken(data.data)
     }
 
     return data;
@@ -36,16 +48,7 @@ export const authApi = {
     if (!token) return null;
 
     try {
-      // Decode the JWT token (it's in base64 format)
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(
-        atob(base64)
-          .split('')
-          .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-          .join('')
-      );
-      return JSON.parse(jsonPayload);
+      return jwtDecode<User>(token);
     } catch (error) {
       console.error('Error decoding token:', error);
       return null;
@@ -53,8 +56,7 @@ export const authApi = {
   },
 
   logout() {
-    Cookies.remove(ACCESS_TOKEN_NAME);
-    Cookies.remove(REFRESH_TOKEN_NAME);
+    removeToken()
   },
 
   getAccessToken(): string | undefined {
@@ -75,8 +77,7 @@ export const authApi = {
       const { data } = await api.post(apiPath.refreshToken, { refreshToken });
 
       if(data.succeed){
-        Cookies.set(ACCESS_TOKEN_NAME, data.data.accessToken, { expires: twentyMinutes }); // 20 minutes
-        Cookies.set(REFRESH_TOKEN_NAME, data.data.refreshToken, { expires: sevenDays });
+        setToken(data.data)
       }
       else {
         throw new Error(data.message);

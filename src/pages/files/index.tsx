@@ -5,7 +5,6 @@ import { useNotification } from "@/hooks/notification"
 import fileApi from "@/apis/files"
 import { RootState } from "@/store"
 import { useDispatch, useSelector } from "react-redux"
-import { FileInformation } from "@/types/files"
 import { setLoading } from "@/store/slices/loadingSlice"
 import { AccountType, StorageSource } from "@/constants/enum"
 import {
@@ -28,17 +27,14 @@ export default function FilesPage() {
     const [storageSource, setStorageSource] = useState(user?.accountType == AccountType.Free ? StorageSource.Telegram : StorageSource.R2)
     const [uploadProgresses, setUploadProgresses] = useState<Progress[]>([])
     const [downloadProgresses, setDownloadProgresses] = useState<Progress[]>([])
-    const { data: telegramFiles, isLoading: isTelegramFilesLoading } = useFilesByUserName({ userName: user?.userName, storageSource: StorageSource.Telegram, pageIndex: 0, pageSize: 10 })
     const { data: r2Files, isLoading: isR2FilesLoading  } = useFilesByUserName({ userName: user?.userName, storageSource: StorageSource.R2, pageIndex: 0, pageSize: 10 })
+    const { data: telegramFiles, isLoading: isTelegramFilesLoading } = useFilesByUserName({ userName: user?.userName, storageSource: StorageSource.Telegram, pageIndex: 0, pageSize: 10 })
+    
     const dispatch = useDispatch()
-
     useEffect(() => {
-        if (user?.userName) {
-            fileApi.getUserFiles(user?.userName, { pageIndex: 0, pageSize: 10, storageSource: StorageSource.Telegram }).then((res) => {
-              console.log(res.data)
-            })
-        }
-    }, [])
+      if (user?.userName) {
+      }
+    }, [user])
 
     const handleDelete = async (id: string, fileName: string, source: number) => {
         if(user?.userName){
