@@ -28,3 +28,8 @@ export interface LoginRequest{
     email: string
     password: string
 }
+
+export interface ConfirmRegistrationRequest {
+    userId: string;
+    token: string;
+}

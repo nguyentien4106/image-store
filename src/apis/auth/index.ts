@@ -1,8 +1,9 @@
-import type { AuthToken, LoginRequest, SignUpRequest, User } from "@/types/auth";
+import type { AuthToken, LoginRequest, SignUpRequest, User, ConfirmRegistrationRequest } from "@/types/auth";
 import { api } from "@/config/api";
 import Cookies from "js-cookie";
 import { AppResponse } from "@/types";
 import { jwtDecode } from "jwt-decode";
+
 const ACCESS_TOKEN_NAME = "estore-accessToken";
 const REFRESH_TOKEN_NAME = "estore-refreshToken";
 
@@ -13,6 +14,7 @@ const apiPath = {
   login: "/auth/login",
   register: "/auth/register",
   refreshToken: "/auth/refresh-token",
+  confirmRegistration: "/auth/confirm-registration",
 }
 
 const setToken = (data: AuthToken) => {
@@ -89,6 +91,11 @@ export const authApi = {
       this.logout();
       throw error;
     }
-  }
+  },
+
+  confirmRegistration: async (data: ConfirmRegistrationRequest): Promise<AppResponse<boolean>> => {
+    const response = await api.post<AppResponse<boolean>>(apiPath.confirmRegistration, data);
+    return response.data;
+  },
 };
 

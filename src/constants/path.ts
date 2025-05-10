@@ -1,6 +1,7 @@
 export const AUTH_PATH = {
     login: '/login',
     signup: '/signup',
+    registerConfirmation: '/register-confirmation',
     changePassword: '/account/change-password',
     
 }
