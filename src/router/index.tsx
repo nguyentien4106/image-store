@@ -9,6 +9,8 @@ import AuthLayout from '@/layouts/auth-layout'
 import { paymentRoutes } from './payment'
 import PricingPage from '@/pages/pricing'
 import AccountPage from '@/pages/account'
+import RegisterConfirmation from '@/pages/auth/register-confirmation'
+import { AUTH_PATH } from '@/constants/path'
 
 export const router = createBrowserRouter([
   {
@@ -25,13 +27,7 @@ export const router = createBrowserRouter([
   {
     path: '/',
     element: <ProtectedLayout />,
-    children: [...dashboardRoutes, ...fileRoutes],
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/',
-    element: <ProtectedLayout />,
-    children: [...paymentRoutes],
+    children: [...dashboardRoutes, ...fileRoutes, ...paymentRoutes],
     errorElement: <ErrorPage />,
   },
   {
@@ -43,5 +39,9 @@ export const router = createBrowserRouter([
     path: '/account',
     element: <AccountPage />,
     errorElement: <ErrorPage />,
+  },
+  {
+    path: AUTH_PATH.registerConfirmation,
+    element: <RegisterConfirmation />,
   },
 ])

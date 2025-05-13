@@ -14,7 +14,7 @@ const apiPath = {
   login: "/auth/login",
   register: "/auth/register",
   refreshToken: "/auth/refresh-token",
-  confirmRegistration: "/auth/confirm-registration",
+  confirmEmail: "/auth/confirm-email",
 }
 
 const setToken = (data: AuthToken) => {
@@ -93,8 +93,8 @@ export const authApi = {
     }
   },
 
-  confirmRegistration: async (data: ConfirmRegistrationRequest): Promise<AppResponse<boolean>> => {
-    const response = await api.post<AppResponse<boolean>>(apiPath.confirmRegistration, data);
+  confirmEmail: async (data: ConfirmRegistrationRequest): Promise<AppResponse<boolean>> => {
+    const response = await api.post<AppResponse<boolean>>(apiPath.confirmEmail, data);
     return response.data;
   },
 };

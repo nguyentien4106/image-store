@@ -17,6 +17,14 @@ interface DownloadProgress {
   loaded: number;
   total: number;
 }
+interface UploadFileChunkRequest {
+  File: Blob
+  ChunkIndex: number
+  TotalChunks: number
+  FileName: string
+  UserId: string
+  FileId: string
+}
 
 const apiPath = {
   uploadFile: "/files/",
@@ -24,10 +32,30 @@ const apiPath = {
   deleteFile: "/files",
   downloadFile: "/files/download",
   downloadFileLarge: "/files/download-large-file",
-  getPreviewFile: "/files/preview/"
+  getPreviewFile: "/files/preview/",
+  uploadFileChunk: "/files/multipart"
 }
 
 const fileApi = {
+
+
+  uploadFileChunk: async (data: UploadFileChunkRequest): Promise<AppResponse<FileInformation>> => {
+    const formData = new FormData();
+    formData.append('File', data.File);
+    formData.append('ChunkIndex', data.ChunkIndex.toString());
+    formData.append('TotalChunks', data.TotalChunks.toString());
+    formData.append('FileName', data.FileName);
+    formData.append('UserId', data.UserId);
+    formData.append('FileId', data.FileId);
+    
+    const response = await api.post(apiPath.uploadFileChunk, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      }
+    });
+    return response.data;
+  },
+
   /**
    * Upload a new image
    * @param file The image file to upload

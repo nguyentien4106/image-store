@@ -10,9 +10,6 @@ export const authRoutes = [
   {
     path: AUTH_PATH.signup,
     element: <SignUp />,
-  },
-  {
-    path: AUTH_PATH.registerConfirmation,
-    element: <RegisterConfirmation />,
-  },
+  }
+
 ] 

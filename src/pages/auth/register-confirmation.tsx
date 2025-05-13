@@ -19,7 +19,7 @@ export default function RegisterConfirmationPage() {
 
         if (userId && token) {
             setStatus("loading");
-            authApi.confirmRegistration({ userId, token })
+            authApi.confirmEmail({ userId, token })
                 .then(() => {
                     setStatus("success");
                     setMessage("Your email has been successfully confirmed! You can now log in.");
