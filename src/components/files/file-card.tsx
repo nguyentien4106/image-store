@@ -9,7 +9,7 @@ import { Download, Eye, Trash2 } from "lucide-react";
 import { getDateTimeString, getFileSizeInMb } from "@/lib/utils";
 import { getFileTypeIcon } from "@/lib/icons";
 import { FileInformation } from "@/types/files";
-import { StorageSource } from "@/constants/enum";
+import { FileStatus, StorageSource } from "@/constants/enum";
 import { getStorageSourceIcon } from "@/helpers";
 import {
   AlertDialog,
@@ -116,6 +116,15 @@ export function FileCard({ file, onDownload, onDelete, downloadProgress }: FileC
               </AlertDialogContent>
             </AlertDialog>
           )}
+          <div className="flex items-center gap-2">
+            {file.fileStatus === FileStatus.Uploading && (
+              <span className="text-xs text-gray-500">Uploading</span>
+            )}
+            {file.fileStatus === FileStatus.Uploaded && (
+              <span className="text-xs text-gray-500">Uploaded</span>
+            )}
+            
+          </div>
         </div>
       </CardAction>
       <CardContent className="p-4 flex-grow">

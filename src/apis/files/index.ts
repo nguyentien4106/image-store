@@ -24,6 +24,7 @@ interface UploadFileChunkRequest {
   FileName: string
   UserId: string
   FileId: string
+  UserName: string
 }
 
 const apiPath = {
@@ -47,6 +48,7 @@ const fileApi = {
     formData.append('FileName', data.FileName);
     formData.append('UserId', data.UserId);
     formData.append('FileId', data.FileId);
+    formData.append('UserName', data.UserName);
     
     const response = await api.post(apiPath.uploadFileChunk, formData, {
       headers: {

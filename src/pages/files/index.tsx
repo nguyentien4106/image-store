@@ -21,6 +21,7 @@ import { Progress } from "@/types"
 import { FileSelector } from "@/components/files/file-selector"
 import { useFilesByUserName } from "@/hooks/queries/use-files"
 import { Button } from "@/components/ui/button"
+import { FileInformation } from "@/types/files"
 
 const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB chunk size
 
@@ -30,8 +31,8 @@ export default function FilesPage() {
     const [storageSource, setStorageSource] = useState(user?.accountType == AccountType.Free ? StorageSource.Telegram : StorageSource.R2)
     const [uploadProgresses, setUploadProgresses] = useState<Progress[]>([])
     const [downloadProgresses, setDownloadProgresses] = useState<Progress[]>([])
-    const { data: r2Files, isLoading: isR2FilesLoading  } = useFilesByUserName({ userName: user?.userName, storageSource: StorageSource.R2, pageIndex: 0, pageSize: 10 })
-    const { data: telegramFiles, isLoading: isTelegramFilesLoading } = useFilesByUserName({ userName: user?.userName, storageSource: StorageSource.Telegram, pageIndex: 0, pageSize: 10 })
+    const [r2Files, setR2Files] = useState<FileInformation[]>([])
+    const [telegramFiles, setTelegramFiles] = useState<FileInformation[]>([])
     
     const dispatch = useDispatch()
     const multipartFileInputRef = useRef<HTMLInputElement>(null);
@@ -39,7 +40,23 @@ export default function FilesPage() {
 
     useEffect(() => {
       if (user?.userName) {
-      }
+            const r2 = fileApi.getUserFiles(user.userName, {
+                storageSource: StorageSource.R2,
+                pageIndex: 0,
+                pageSize: 10
+            })
+
+            const telegram = fileApi.getUserFiles(user.userName, {
+                storageSource: StorageSource.Telegram,
+                pageIndex: 0,
+                pageSize: 10
+            })
+
+            Promise.all([r2, telegram]).then(([r2, telegram]) => {
+                setR2Files(r2.data.data)
+                setTelegramFiles(telegram.data.data)
+            })
+        }
     }, [user])
 
     const handleDelete = async (id: string, fileName: string, source: number) => {
@@ -53,12 +70,12 @@ export default function FilesPage() {
                 if (result.succeed) {
                     success("File deleted successfully")
                     
-                    if (source === StorageSource.Telegram && telegramFiles?.data) {
-                        const updatedFiles = telegramFiles.data.data.filter(file => file.id !== id);
-                        telegramFiles.data.data = updatedFiles;
-                    } else if (source === StorageSource.R2 && r2Files?.data) {
-                        const updatedFiles = r2Files.data.data.filter(file => file.id !== id);
-                        r2Files.data.data = updatedFiles;
+                    if (source === StorageSource.Telegram && telegramFiles) {
+                        const updatedFiles = telegramFiles.filter(file => file.id !== id);
+                        setTelegramFiles(updatedFiles);
+                    } else if (source === StorageSource.R2 && r2Files) {
+                        const updatedFiles = r2Files.filter(file => file.id !== id);
+                        setR2Files(updatedFiles);
                     }
                 } else {
                     error(result.message)
@@ -167,15 +184,6 @@ export default function FilesPage() {
         const fileId = Date.now() + "-" + file.name; // Unique ID for this chunked upload session
         const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
         
-        setUploadProgresses(prev => [...prev, { 
-            id: fileId, 
-            name: file.name, 
-            progress: 0, 
-            type: "upload", 
-            isChunked: true, 
-            totalChunks, 
-            chunksUploaded: 0 
-        }]);
 
         try {
             for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
@@ -190,28 +198,22 @@ export default function FilesPage() {
                     ChunkIndex: chunkIndex,
                     TotalChunks: totalChunks,
                     FileName: file.name,
-                    UserId: user.userName,
-                    FileId: fileId
+                    UserId: user.userId,
+                    FileId: fileId,
+                    UserName: user.userName
                 });
 
-               
             }
             success(`Successfully uploaded ${file.name} in chunks.`);
         } catch (err: any) {
             error(err.message || `Failed to upload ${file.name} in chunks.`);
-            // Optionally mark the specific progress item as failed or remove it
-            setUploadProgresses(prev => prev.map(p => p.id === fileId ? {...p, progress: -1 /* Mark as error */} : p ));
         } finally {
-            // Keep the progress bar if it's completed or errored, or remove after a delay
-            // For now, successful uploads are removed by existing logic if it hits 100% and then another success action occurs
-            // Errored items marked with -1 will persist until handled differently
             if (chunkedFileInputRef.current) {
                 chunkedFileInputRef.current.value = ""; // Reset file input
             }
         }
     };
 
-    const isAnyUploadActive = uploadProgresses.some(p => p.progress < 100 && p.progress >= 0);
 
     return (
         <div className="space-y-6">
@@ -265,7 +267,7 @@ export default function FilesPage() {
                                 <Button
                                     variant="outline"
                                     onClick={() => multipartFileInputRef.current?.click()}
-                                    disabled={isAnyUploadActive} 
+                                    disabled={false} 
                                 >
                                     <FileUp className="mr-2 h-4 w-4" />
                                     Quick Upload
@@ -282,7 +284,7 @@ export default function FilesPage() {
                                 <Button
                                     variant="outline"
                                     onClick={() => chunkedFileInputRef.current?.click()}
-                                    disabled={isAnyUploadActive}
+                                    disabled={false}
                                 >
                                     <FileText className="mr-2 h-4 w-4" />
                                     Chunked Upload
@@ -290,53 +292,18 @@ export default function FilesPage() {
                             </div>
                         </div>
                     </div>
-                    {(uploadProgresses.length > 0) && (
-                        <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 space-y-4 z-50">
-                            {uploadProgresses.map((progress) => (
-                                <div key={progress.id} className="bg-background p-4 rounded-lg shadow-lg">
-                                    <div className="flex items-center justify-between mb-2">
-                                        <span className="text-sm font-medium truncate max-w-[200px]">
-                                            {progress.isChunked ? `Chunk Uploading: ${progress.name}` : `Uploading: ${progress.name}`}
-                                            {progress.isChunked && progress.totalChunks && ` (${progress.chunksUploaded}/${progress.totalChunks} chunks)`}
-                                        </span>
-                                        <span className="text-sm text-muted-foreground">
-                                            {progress.progress === -1 ? "Error" : `${progress.progress}%`}
-                                        </span>
-                                    </div>
-                                    <ProgressBar progress={progress.progress === -1 ? 100 : progress.progress} variant={progress.progress === -1 ? "destructive" : "default"} />
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                    {downloadProgresses.length > 0 && (
-                        <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 space-y-4 z-50">
-                        {downloadProgresses.map((progress) => (
-                            <div key={progress.id} className="bg-background p-4 rounded-lg shadow-lg">
-                                <div className="flex items-center justify-between mb-2">
-                                    <span className="text-sm font-medium truncate max-w-[200px]">
-                                        Downloading: {progress.name}
-                                    </span>
-                                    <span className="text-sm text-muted-foreground">
-                                        {progress.progress}%
-                                    </span>
-                                </div>
-                                    <ProgressBar progress={progress.progress} />
-                                </div>
-                            ))} 
-                        </div>
-                    )}
                     <ListFiles
-                        files={telegramFiles?.data.data}
+                        files={telegramFiles}
                         onDelete={handleDelete}
                         onDownload={handleDownload}
-                        isLoading={isTelegramFilesLoading}
+                        isLoading={false}
                         title="Telegram Files"
                     />
                     <ListFiles
-                        files={r2Files?.data.data}
+                        files={r2Files}
                         onDelete={handleDelete}
                         onDownload={handleDownload}
-                        isLoading={isR2FilesLoading}
+                        isLoading={false}
                         title="R2 Files"
                     />
                 </div>

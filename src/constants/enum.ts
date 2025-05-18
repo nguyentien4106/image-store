@@ -15,6 +15,13 @@ export enum FileType {
     Unknown = 8
 }
 
+export enum FileStatus {
+    Pending = 0,
+    Uploading = 1,
+    Uploaded = 2,
+    Failed = 3,
+}
+
 export enum AccountType {
     Free = "Free",
     Pro = "Pro",

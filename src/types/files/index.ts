@@ -1,3 +1,5 @@
+import { FileStatus } from "@/constants/enum";
+
 export interface UploadFileFormData {
     file: File
     userName: string
@@ -32,6 +34,7 @@ export interface FileInformation{
     url: string
     userId: string
     createdAt: string
+    fileStatus: FileStatus
 }
 
 export interface PreviewFileResponse{

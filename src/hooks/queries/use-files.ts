@@ -14,7 +14,11 @@ export function useFilesByUserName(options: UseFilesOptions) {
   const { userName, ...queryParams } = options
   
   if (!userName) {
-    throw new Error('userName is required')
+    return {
+      data: [],
+      isLoading: false,
+      isError: false,
+    }
   }
 
   return useQuery({
