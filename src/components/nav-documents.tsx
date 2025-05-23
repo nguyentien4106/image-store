@@ -1,12 +1,16 @@
 "use client"
 
 import {
-  IconDots,
-  IconFolder,
-  IconShare3,
-  IconTrash,
-  type Icon,
-} from "@tabler/icons-react"
+  ChevronDown,
+  ChevronRight,
+  File,
+  Folder,
+  FolderOpen,
+  Share2,
+  Trash2,
+  MoreHorizontal,
+} from "lucide-react"
+import type { LucideIcon } from "lucide-react"
 
 import {
   DropdownMenu,
@@ -24,65 +28,85 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { cn } from "@/lib/utils"
 
-export function NavDocuments({
-  items,
-}: {
-  items: {
-    name: string
-    url: string
-    icon: Icon
-  }[]
-}) {
+interface NavItem {
+  title: string
+  label?: string
+  icon?: string | LucideIcon 
+  variant: "default" | "ghost"
+  href?: string
+  items?: NavItem[]
+  onClick?: () => void
+}
+
+interface NavDocumentsProps {
+  items: NavItem[]
+  classNames?: {
+    item?: string
+    trigger?: string
+    content?: string
+  }
+  className?: string
+}
+
+const Icons = {
+  folder: Folder,
+  folderOpen: FolderOpen,
+  file: File,
+  chevronDown: ChevronDown,
+  chevronRight: ChevronRight,
+}
+
+export function NavDocuments({ items, className, ...props }: NavDocumentsProps) {
   const { isMobile } = useSidebar()
+
+  const renderNavItem = (item: NavItem, depth = 0) => {
+    const IconComponent = item.icon ? Icons[item.icon as keyof typeof Icons] || MoreHorizontal : Folder
+
+    return (
+      <SidebarMenuItem key={item.title} className="text-sm">
+        <SidebarMenuButton asChild>
+          <a href={item.href}>
+            <IconComponent />
+            <span>{item.title}</span>
+          </a>
+        </SidebarMenuButton>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <SidebarMenuAction
+              showOnHover
+              className="data-[state=open]:bg-accent rounded-sm"
+            >
+              <MoreHorizontal />
+              <span className="sr-only">More</span>
+            </SidebarMenuAction>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-52">
+            <DropdownMenuItem>New file</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Share2 />
+              <span>Share</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem variant="destructive">
+              <Trash2 />
+              <span>Delete</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </SidebarMenuItem>
+    )
+  }
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>Documents</SidebarGroupLabel>
       <SidebarMenu>
-        {items.map((item) => (
-          <SidebarMenuItem key={item.name}>
-            <SidebarMenuButton asChild>
-              <a href={item.url}>
-                <item.icon />
-                <span>{item.name}</span>
-              </a>
-            </SidebarMenuButton>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuAction
-                  showOnHover
-                  className="data-[state=open]:bg-accent rounded-sm"
-                >
-                  <IconDots />
-                  <span className="sr-only">More</span>
-                </SidebarMenuAction>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className="w-24 rounded-lg"
-                side={isMobile ? "bottom" : "right"}
-                align={isMobile ? "end" : "start"}
-              >
-                <DropdownMenuItem>
-                  <IconFolder />
-                  <span>Open</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <IconShare3 />
-                  <span>Share</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem variant="destructive">
-                  <IconTrash />
-                  <span>Delete</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        ))}
+        {items.map((item) => renderNavItem(item))}
         <SidebarMenuItem>
           <SidebarMenuButton className="text-sidebar-foreground/70">
-            <IconDots className="text-sidebar-foreground/70" />
+            <MoreHorizontal className="text-sidebar-foreground/70" />
             <span>More</span>
           </SidebarMenuButton>
         </SidebarMenuItem>

@@ -5,7 +5,7 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import { Download, Eye, Trash2 } from "lucide-react";
+import { Download, Eye, Trash2, UploadCloud, LoaderCircle } from "lucide-react";
 import { getDateTimeString, getFileSizeInMb } from "@/lib/utils";
 import { getFileTypeIcon } from "@/lib/icons";
 import { FileInformation } from "@/types/files";
@@ -30,12 +30,14 @@ import {
 import { PreviewContent } from "./preview-content";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "react-router-dom";
+import { FileCardAction } from "./file-card-action";
 
 interface FileCardProps {
   file: FileInformation;
   onDownload?: (id: string, fileName: string, storageSource: StorageSource) => void;
   onDelete?: (id: string, fileName: string, storageSource: number) => void;
   downloadProgress?: number;
+  uploadProgress?: number;
 }
 
 const isPreviewable = (file: FileInformation) => {
@@ -43,90 +45,25 @@ const isPreviewable = (file: FileInformation) => {
   return isMediaFile;
 };
 
-export function FileCard({ file, onDownload, onDelete, downloadProgress }: FileCardProps) {
+export function FileCard({ file, onDownload, onDelete, downloadProgress, uploadProgress }: FileCardProps) {
   const showPreview = isPreviewable(file);
   const isDownloading = typeof downloadProgress === 'number';
+  const isUploading = file.fileStatus === FileStatus.Uploading;
+  const showUploadProgressBar = typeof uploadProgress === 'number' && isUploading;
 
   return (
-    <Card className="overflow-hidden flex flex-col h-full">
-      <CardAction className="w-full">
-        <div className="flex items-center justify-center gap-3">
-          {showPreview && (
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Eye className="h-4 w-4" />
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-4xl">
-                {
-                  file.storageSource === StorageSource.Telegram ? (
-                    <div className="flex flex-col items-center justify-center h-full">
-                      <p className="text-sm text-gray-500">Preview Content is only support by R2 Storage. </p>
-                      <p className="text-sm text-gray-500">Please <Link to="/pricing" className="text-blue-500">upgrade</Link> your account to R2 Storage to preview content. </p>
-                    </div>
-                  ) : (
-                    <PreviewContent file={file} />
-                  )
-                }
-              </DialogContent>
-            </Dialog>
-          )}
-          {onDownload && (
-            <Button
-              variant="secondary"
-              size="icon"
-              onClick={() => onDownload(file.id, file.fileName, file.storageSource)}
-              disabled={isDownloading}
-              className="relative"
-            >
-              <Download className="h-4 w-4" />
-              {isDownloading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-md">
-                  <div className="w-full px-2">
-                    <Progress value={downloadProgress} className="h-1" />
-                  </div>
-                </div>
-              )}
-            </Button>
-          )}
-          {onDelete && (
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button
-                  variant="destructive"
-                  size="icon"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This will permanently delete the file "{file.fileName}". This action cannot be undone.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => onDelete(file.id, file.fileName, file.storageSource)}>
-                    Delete
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          )}
-          <div className="flex items-center gap-2">
-            {file.fileStatus === FileStatus.Uploading && (
-              <span className="text-xs text-gray-500">Uploading</span>
-            )}
-            {file.fileStatus === FileStatus.Uploaded && (
-              <span className="text-xs text-gray-500">Uploaded</span>
-            )}
-            
-          </div>
-        </div>
-      </CardAction>
+    <Card className={`overflow-hidden flex flex-col h-full ${isUploading ? 'opacity-75 pointer-events-none' : ''}`}>
+      <FileCardAction
+        file={file}
+        isUploading={isUploading}
+        showUploadProgressBar={showUploadProgressBar}
+        uploadProgress={uploadProgress}
+        isDownloading={isDownloading}
+        downloadProgress={downloadProgress}
+        showPreview={showPreview}
+        onDownload={onDownload}
+        onDelete={onDelete}
+      />
       <CardContent className="p-4 flex-grow">
         <div className="flex items-center gap-2 mb-1">
           <h3 className="font-medium truncate">{file.fileName}</h3>

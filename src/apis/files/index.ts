@@ -1,5 +1,5 @@
 import { api } from "@/config/api";
-import { DeleteFileRequest, DownloadFileRequest, FileInformation, UploadFileFormData, PreviewFileResponse, GetFilesByUserNameRequest } from "@/types/files";
+import { DeleteFileRequest, DownloadFileRequest, FileInformation, UploadFileFormData, PreviewFileResponse, GetFilesByUserNameRequest, UploadFileChunkRequest } from "@/types/files";
 import { AppResponse, PaginatedResult } from "@/types";
 import { AxiosProgressEvent } from "axios";
 
@@ -17,15 +17,6 @@ interface DownloadProgress {
   loaded: number;
   total: number;
 }
-interface UploadFileChunkRequest {
-  File: Blob
-  ChunkIndex: number
-  TotalChunks: number
-  FileName: string
-  UserId: string
-  FileId: string
-  UserName: string
-}
 
 const apiPath = {
   uploadFile: "/files/",
@@ -42,14 +33,22 @@ const fileApi = {
 
   uploadFileChunk: async (data: UploadFileChunkRequest): Promise<AppResponse<FileInformation>> => {
     const formData = new FormData();
-    formData.append('File', data.File);
-    formData.append('ChunkIndex', data.ChunkIndex.toString());
-    formData.append('TotalChunks', data.TotalChunks.toString());
-    formData.append('FileName', data.FileName);
-    formData.append('UserId', data.UserId);
-    formData.append('FileId', data.FileId);
-    formData.append('UserName', data.UserName);
-    
+
+    // Iterate over the keys of the data object
+    for (const key in data) {
+        if (Object.prototype.hasOwnProperty.call(data, key)) {
+            const value = data[key as keyof UploadFileChunkRequest];
+
+            // Handle the File blob separately
+            if (key === 'File' && value instanceof Blob) {
+                formData.append(key, value, data.FileName); // Use original FileName for the blob
+            } else if (value !== undefined && value !== null) {
+                // Append other properties as strings
+                formData.append(key, String(value));
+            }
+        }
+    }
+
     const response = await api.post(apiPath.uploadFileChunk, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',

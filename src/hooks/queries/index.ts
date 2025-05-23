@@ -1,6 +1,4 @@
 // Example query hook
-import { useQuery } from '@tanstack/react-query'
-
 export const queryKeys = {
   files: {
     all: ['files'] as const,

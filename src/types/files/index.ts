@@ -48,3 +48,14 @@ export interface GetFilesByUserNameRequest{
     pageSize: number
     storageSource: number
 }
+
+export interface UploadFileChunkRequest {
+    File: Blob
+    ChunkIndex: number
+    TotalChunks: number
+    FileName: string
+    UserId: string
+    FileId: string
+    UserName: string
+    ContentType: string
+}

@@ -16,12 +16,11 @@ import {
 } from "@/components/ui/select"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { CrownIcon, FileUp, FileText } from "lucide-react"
-import { ProgressBar } from "@/components/ui/progress-bar"
 import { Progress } from "@/types"
 import { FileSelector } from "@/components/files/file-selector"
-import { useFilesByUserName } from "@/hooks/queries/use-files"
 import { Button } from "@/components/ui/button"
-import { FileInformation } from "@/types/files"
+import { FileInformation, UploadFileChunkRequest } from "@/types/files"
+import dayjs from "dayjs"
 
 const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB chunk size
 
@@ -30,13 +29,12 @@ export default function FilesPage() {
     const { user } = useSelector((state: RootState) => state.user)
     const [storageSource, setStorageSource] = useState(user?.accountType == AccountType.Free ? StorageSource.Telegram : StorageSource.R2)
     const [uploadProgresses, setUploadProgresses] = useState<Progress[]>([])
-    const [downloadProgresses, setDownloadProgresses] = useState<Progress[]>([])
     const [r2Files, setR2Files] = useState<FileInformation[]>([])
     const [telegramFiles, setTelegramFiles] = useState<FileInformation[]>([])
     
     const dispatch = useDispatch()
     const multipartFileInputRef = useRef<HTMLInputElement>(null);
-    const chunkedFileInputRef = useRef<HTMLInputElement>(null); // Ref for the chunked file input
+    const chunkedFileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
       if (user?.userName) {
@@ -91,26 +89,17 @@ export default function FilesPage() {
     const handleDownload = async (id: string, fileName: string, storageSourceParam: StorageSource) => {
         if(user?.userName){
             try {
-                setDownloadProgresses(prev => [...prev, { id, name: fileName, progress: 0, type: "download" }])
                 
                 await fileApi.downloadFile({
                     id: id,
                     storageSource: storageSourceParam,
                     onProgress: (percentCompleted) => {
-                        setDownloadProgresses(prev => 
-                            prev.map(progress => 
-                                progress.name === fileName && progress.type === "download"
-                                    ? { ...progress, progress: percentCompleted }
-                                    : progress
-                            )
-                        )
+                       
                     }
                 })
 
-                setDownloadProgresses(prev => prev.filter(progress => progress.id !== id))
                 success(`Download completed: ${fileName}`)
             } catch (err: any) {
-                setDownloadProgresses(prev => prev.filter(progress => progress.id !== id))
                 error(err.message || `Failed to download ${fileName}`)
             }
         }
@@ -162,9 +151,8 @@ export default function FilesPage() {
     const handleFolderUpload = async (files: File[]) => {
         if(user?.userName){
             try {
-                // Process folder uploads sequentially to avoid overwhelming the progress UI or backend
                 for (const file of files) {
-                    await handleUpload(file); // Reuse single file upload logic
+                    await handleUpload(file);
                 }
                 success(`Successfully processed ${files.length} files from folder.`);
             } catch (err: any) {
@@ -181,30 +169,40 @@ export default function FilesPage() {
             return;
         }
 
-        const fileId = Date.now() + "-" + file.name; // Unique ID for this chunked upload session
+        const fileId = dayjs().unix() + "-" + file.name;
         const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
-        
+        const contentType = file.type;
+        const chunkPayloads = [];
 
         try {
             for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
                 const start = chunkIndex * CHUNK_SIZE;
                 const end = Math.min(start + CHUNK_SIZE, file.size);
                 const chunk = file.slice(start, end);
-
-                // This is a hypothetical API call structure.
-                // You'll need to implement `uploadFileChunk` in your `fileApi`.
-                await fileApi.uploadFileChunk({
+                const chunkPayload : UploadFileChunkRequest = {
                     File: chunk,
                     ChunkIndex: chunkIndex,
                     TotalChunks: totalChunks,
                     FileName: file.name,
                     UserId: user.userId,
                     FileId: fileId,
-                    UserName: user.userName
-                });
-
+                    UserName: user.userName,
+                    ContentType: contentType
+                }
+                chunkPayloads.push(chunkPayload);
             }
-            success(`Successfully uploaded ${file.name} in chunks.`);
+            const results = await Promise.all(chunkPayloads.map((chunkPayload) => {
+                return fileApi.uploadFileChunk(chunkPayload);
+            }));
+
+            const fileResult = results.filter(result => result.succeed && result.data)
+            if(fileResult.length > 0){
+                success(`Successfully uploaded ${file.name} in chunks.`);
+                const fileInformation = fileResult[0].data;
+                setTelegramFiles(prev => [fileInformation, ...prev]);
+            }else{
+                error(`Failed to upload ${file.name} in chunks.`);
+            }
         } catch (err: any) {
             error(err.message || `Failed to upload ${file.name} in chunks.`);
         } finally {
