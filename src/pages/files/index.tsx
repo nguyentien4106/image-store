@@ -51,8 +51,8 @@ export default function FilesPage() {
             })
 
             Promise.all([r2, telegram]).then(([r2, telegram]) => {
-                setR2Files(r2.data.data)
-                setTelegramFiles(telegram.data.data)
+                setR2Files(r2.data.data || [])
+                setTelegramFiles(telegram.data.data || [])
             })
         }
     }, [user])

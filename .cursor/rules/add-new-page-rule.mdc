@@ -1,0 +1,112 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Rule for Adding a New Page
+
+This rule outlines the steps and considerations when adding a new page to the CloudStore project.
+
+## 1. Page Component Creation
+
+-   Create the main page component file within the `src/pages/` directory.
+-   Follow a feature-based folder structure. For a page named `MyNewPage`, create it at `src/pages/my-new-page/index.tsx`.
+    -   Example: `[src/pages/stores/index.tsx](mdc:src/pages/stores/index.tsx)`
+-   Components should be functional components written in TypeScript (`.tsx`).
+-   Use PascalCase for component names (e.g., `MyNewPage`).
+
+## 2. Routing
+
+-   Create a new TypeScript file (e.g., `my-new-page.tsx`) within the `src/router/` directory to define routes for the new page or feature.
+    -   Example: For a "stores" feature, create `src/router/stores.tsx`.
+    -   This keeps route definitions modular and organized.
+-   Inside this new file, define an array of route objects. Use `React.lazy()` for page components to enable code splitting and improve performance.
+
+    ```tsx
+    // Example: src/router/my-new-page.tsx
+    import { lazy } from 'react';
+    import { type RouteObject } from 'react-router-dom';
+
+    const MyNewPage = lazy(() => import('@/pages/my-new-page'));
+    // const AnotherPageInFeature = lazy(() => import('@/pages/my-new-page/another'));
+
+    export const myNewPageRoutes: RouteObject[] = [
+      {
+        path: '/my-new-page',
+        element: <MyNewPage />,
+      },
+      // {
+      //   path: '/my-new-page/another',
+      //   element: <AnotherPageInFeature />,
+      // },
+    ];
+    ```
+
+-   Import the newly defined routes into the main router configuration file (e.g., `src/router/index.tsx`).
+-   Spread these routes into the appropriate part of your main router setup (e.g., under a `ProtectedLayout` or a specific path segment).
+    -   Reference: `[cloud-store-rule](mdc:.cursor/rules/cloud-store-rule.mdc)` (Project Structure section regarding `src/router/`)
+
+    ```tsx
+    // Example: src/router/index.tsx
+    import { createBrowserRouter } from 'react-router-dom';
+    // ... other imports
+    import { myNewPageRoutes } from './my-new-page'; // Import your new routes
+    import { ProtectedLayout } from '@/layouts/protected-layout';
+
+    export const router = createBrowserRouter([
+      // ... other route configurations
+      {
+        path: '/', // Or a specific base path for this feature, e.g., '/app'
+        element: <ProtectedLayout />,
+        children: [
+          // ... other existing routes (e.g., ...dashboardRoutes)
+          ...myNewPageRoutes, // Add your new feature routes here
+        ],
+      },
+      // ... other route configurations
+    ]);
+    ```
+
+## 3. Page-Specific Components
+
+-   If the new page requires specific child components that are not reusable elsewhere, create them within a dedicated folder for that page under `src/components/`.
+    -   Example: `src/components/my-new-page/MySpecificComponent.tsx`.
+    -   Reference: `[cloud-store-rule](mdc:.cursor/rules/cloud-store-rule.mdc)` (Project Structure section regarding `src/components/{page}/`)
+-   For general UI components, consider placing them in `src/components/ui/` or a shared components directory.
+
+## 4. API Integration (if applicable)
+
+-   If the page needs to fetch or send data, API integration methods should be organized.
+-   Place page-specific API methods in `src/apis/{page}/`.
+    -   Example: `src/apis/my-new-page/api.ts`.
+    -   Reference: `[cloud-store-rule](mdc:.cursor/rules/cloud-store-rule.mdc)` (Project Structure section regarding `src/apis/{page}/`)
+-   Ensure proper loading states and error handling are implemented for API calls.
+
+## 5. State Management
+
+-   Decide if the page requires global state (Redux) or if local component state (`useState`, `useReducer`) is sufficient.
+-   Refer to the State Management guidelines in `[cloud-store-rule](mdc:.cursor/rules/cloud-store-rule.mdc)`.
+
+## 6. Styling
+
+-   Use Tailwind CSS for styling as per `[cloud-store-rule](mdc:.cursor/rules/cloud-store-rule.mdc)`.
+-   Ensure responsive design and follow mobile-first approach.
+
+## 7. Testing
+
+-   Write unit tests for the new page component and any significant child components.
+-   Refer to the Testing Guidelines in `[cloud-store-rule](mdc:.cursor/rules/cloud-store-rule.mdc)`.
+
+## Summary Checklist:
+
+1.  [ ] Create page component in `src/pages/feature-name/index.tsx`.
+2.  [ ] Create feature-specific route file in `src/router/` (e.g., `my-new-page.tsx`) and update `src/router/index.tsx`.
+3.  [ ] Create page-specific components in `src/components/feature-name/` (if needed).
+4.  [ ] Create API methods in `src/apis/feature-name/` (if needed).
+5.  [ ] Implement state management (local or global).
+6.  [ ] Apply Tailwind CSS for styling.
+7.  [ ] Write unit tests.
+
+
+
+

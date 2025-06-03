@@ -21,7 +21,13 @@ export interface SidebarItem {
 export interface PaginatedResult<T> {
   pageIndex: number,
   pageSize: number,
-  count: number
+  sortBy: string,
+  sortOrder: "asc" | "desc",
+  filterQuery: string,
+  count: number,
+  totalPages: number,
+  hasPreviousPage: boolean,
+  hasNextPage: boolean,
   data: T[]
 }
 
@@ -42,4 +48,12 @@ export interface Plan {
       items: string[]
       icon: React.ReactNode
   }[]
+}
+
+export interface PaginationRequest {
+    pageIndex: number,
+    pageSize: number,
+    sortBy: string | null,
+    sortOrder: "asc" | "desc" | null,
+    filterQuery: string | null,
 }

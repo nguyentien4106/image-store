@@ -6,6 +6,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { PaginationRequest } from "@/types";
 
 export function getStorageSourceIcon(source: StorageSource) {
   switch (source) {
@@ -38,4 +39,25 @@ export function getStorageSourceIcon(source: StorageSource) {
     default:
       return <Cloud className="h-4 w-4 text-gray-500" />;
   }
+}
+
+export function buildQueryParams(request: PaginationRequest) {
+  const params = new URLSearchParams();
+  params.set("pageIndex", request.pageIndex.toString());
+  params.set("pageSize", request.pageSize.toString());
+  params.set("sortBy", request.sortBy || "");
+  params.set("sortOrder", request.sortOrder || "");
+  params.set("filterQuery", request.filterQuery || "");
+
+  return "?" + params.toString();
+}
+
+export function getDefaultPaginationRequest(): PaginationRequest {
+  return {
+    pageIndex: 0,
+    pageSize: 10,
+    sortBy: "createdAt",
+    sortOrder: "desc",
+    filterQuery: ""
+  } as PaginationRequest;
 }

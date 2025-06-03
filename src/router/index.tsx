@@ -1,3 +1,4 @@
+import { lazy } from 'react'
 import { createBrowserRouter } from 'react-router-dom'
 import { authRoutes } from './auth'
 import { dashboardRoutes } from './dashboard'
@@ -11,6 +12,7 @@ import PricingPage from '@/pages/pricing'
 import AccountPage from '@/pages/account'
 import RegisterConfirmation from '@/pages/auth/register-confirmation'
 import { AUTH_PATH } from '@/constants/path'
+import { storesRoutes } from './stores'
 
 export const router = createBrowserRouter([
   {
@@ -27,7 +29,12 @@ export const router = createBrowserRouter([
   {
     path: '/',
     element: <ProtectedLayout />,
-    children: [...dashboardRoutes, ...fileRoutes, ...paymentRoutes],
+    children: [
+      ...dashboardRoutes, 
+      ...fileRoutes, 
+      ...paymentRoutes,
+      ...storesRoutes,
+    ],
     errorElement: <ErrorPage />,
   },
   {
