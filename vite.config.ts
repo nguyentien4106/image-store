@@ -13,7 +13,7 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', '@tabler/icons-react', 'linked-dep'], // Ensure these are pre-bundled
+    include: ['react', 'react-dom'], // Ensure these are pre-bundled
   },
   build: {
     rollupOptions: {
@@ -30,9 +30,6 @@ export default defineConfig({
           }
           if (id.includes('src/utils')) {
             return 'utils';
-          }
-          if (id.includes('@tabler/icons-react')) {
-            return 'tabler-icons';
           }
         },
         // Set a minimum chunk size to avoid tiny chunks

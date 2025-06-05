@@ -25,7 +25,16 @@ const addStore = async (payload: AddChannelPayload): Promise<AppResponse<Channel
 
 };
 
+const deleteStore = async (id: string): Promise<AppResponse<Channel>> => {
+    try{
+        const response = await api.delete(`/stores/${id}`);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
 export const storeApi = {
     getStores,
-    addStore
+    addStore,
+    deleteStore
 }

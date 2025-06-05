@@ -13,9 +13,10 @@ import {
 } from "@/components/ui/dialog";
 import { NewStoreForm } from '@/components/stores/new-store-form';
 import { columns } from '@/components/stores/columns';
-import { useReactTable, getCoreRowModel, getPaginationRowModel, type OnChangeFn, type PaginationState as TablePaginationState } from '@tanstack/react-table';
+import { useReactTable, getCoreRowModel, getPaginationRowModel, type PaginationState as TablePaginationState } from '@tanstack/react-table';
 import { DataTablePagination } from '@/components/data-table/data-table-pagination';
 import { Channel, AddChannelPayload } from '@/types/store';
+import { useNotification } from '@/hooks/notification';
 
 const StoresPage: FC = () => {
   const [stores, setStores] = useState<Channel[]>([]);
@@ -24,6 +25,30 @@ const StoresPage: FC = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [pagination, setPagination] = useState<PaginationRequest>(getDefaultPaginationRequest());
   const [pageCount, setPageCount] = useState<number>(-1);
+  const { success, error } = useNotification();
+
+  const refreshStores = useCallback(async () => {
+    setIsLoading(true);
+    try {
+        const result = await storeApi.getStores(pagination);
+        if (result.succeed && result.data?.data) {
+            setStores(result.data.data);
+            setPageCount(result.data.totalPages);
+        } else {
+            setStores([]);
+            setPageCount(0);
+        }
+    } catch (err: any) {
+      setStores([]);
+      setPageCount(0);
+      error(err.message || "Failed to fetch stores");
+    }
+    setIsLoading(false);
+  }, [pagination, error]);
+
+  useEffect(() => {
+    refreshStores();
+  }, [refreshStores]);
 
   const table = useReactTable({
     data: stores,
@@ -56,30 +81,12 @@ const StoresPage: FC = () => {
         };
       });
     },
-  });
-
-  const refreshStores = useCallback(async () => {
-    setIsLoading(true);
-    try {
-        const result = await storeApi.getStores(pagination);
-        console.log(result);
-        if (result.succeed && result.data?.data) {
-            setStores(result.data.data);
-            setPageCount(result.data.totalPages);
-        } else {
-            setStores([]);
-            setPageCount(0);
-        }
-    } catch (err: any) {
-      setStores([]);
-      setPageCount(0);
+    meta: {
+      refreshStores,
+      success: success,
+      error: error,
     }
-    setIsLoading(false);
-  }, [pagination]);
-
-  useEffect(() => {
-    refreshStores();
-  }, [refreshStores]);
+  });
 
   const handleAddChannelSubmit = async (payload: AddChannelPayload) => {
     setIsSubmitting(true);
@@ -87,14 +94,13 @@ const StoresPage: FC = () => {
       const response = await storeApi.addStore(payload);
       if (response.succeed) {
         setIsAddModalOpen(false);
-        await refreshStores();
+        success("Store added successfully");
+        setStores([ response.data, ...stores ]);
       } else {
-        // setAddError(response.message || "Failed to add channel.");
-        // console.error("Add channel failed:", response.message);
+        error(response.message || "Failed to add channel.");
       }
     } catch (err: any) {
-      // setAddError(err.message || "An unexpected error occurred while adding the channel.");
-      // console.error("Add channel submission error:", err);
+      error(err.message || "An unexpected error occurred while adding the channel.");
     }
     setIsSubmitting(false);
   };

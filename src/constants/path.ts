@@ -25,3 +25,7 @@ export const PRICING_PATH = {
 export const PAYMENT_PATH = {
     payment: "/payment"
 }
+
+export const STORES_PATH = {
+    stores: "/stores"
+}   
