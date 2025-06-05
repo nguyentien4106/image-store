@@ -35,6 +35,7 @@ export interface FileInformation{
     userId: string
     createdAt: string
     fileStatus: FileStatus
+    progress: number | null | undefined
 }
 
 export interface PreviewFileResponse{

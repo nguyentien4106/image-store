@@ -21,7 +21,11 @@ export function ListFiles({ files, onDelete, onDownload, isLoading, title }: Lis
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {files?.length ? files?.map((file) => (
-              <FileCard key={file.id} file={file} onDelete={onDelete} onDownload={onDownload} />
+              <FileCard 
+                key={file.id} 
+                file={file} 
+                onDelete={onDelete} 
+                onDownload={onDownload} />
             )) : (
               <div className="text-center text-gray-500">No files found</div>
             )}
