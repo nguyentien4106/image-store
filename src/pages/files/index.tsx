@@ -10,9 +10,9 @@ import { StorageSource } from "@/constants/enum"
 import { Button } from "@/components/ui/button"
 import { FileInformation, UploadFileChunkRequest } from "@/types/files"
 import dayjs from "dayjs"
-import { FileText } from "lucide-react"
+import { LucideUploadCloud } from "lucide-react"
 import * as signalR from "@microsoft/signalr"
-import { DownloadProgressList } from "@/components/notifications"
+import DownloadProgressList from "@/components/files/download-progress-list"
 import { Progress } from "@/types"
 
 const CHUNK_SIZE = 5 * 1024 * 1024;
@@ -197,7 +197,7 @@ export default function FilesPage() {
                         onClick={() => chunkedFileInputRef.current?.click()}
                         disabled={false}
                     >
-                        <FileText className="mr-2 h-4 w-4" />
+                        <LucideUploadCloud size={64}/>
                         Upload 
                     </Button>
                 </div>

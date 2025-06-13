@@ -1,6 +1,6 @@
 import React from 'react';
 import { Progress } from '@/types'; // Assuming this is the correct type for download progress items
-import DownloadProgressItem from './DownloadProgressItem';
+import DownloadProgressItem from './download-progress-item';
 
 interface DownloadProgressListProps {
   downloads: Progress[];
